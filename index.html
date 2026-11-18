@@ -636,12 +636,12 @@
         </div>
 
         <div id="usbQuickControls" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-          <div class="section-label"><span>Quick USB Test Controls</span></div>
+          <div class="section-label"><span>Universal USB Test Controls</span></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({power:true})">Power ON</button>
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({power:false})">Power OFF</button>
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({effect:1})">Rainbow</button>
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({r:255,g:140,b:0})">Warm Amber</button>
+            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({power:1})">Power ON</button>
+            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({power:0})">Power OFF</button>
+            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({action:'fota_check'})">Check FOTA</button>
+            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({action:'reboot'})">Reboot</button>
           </div>
         </div>
 
@@ -650,7 +650,7 @@
             ⚡ How Hybrid USB-FOTA Works
           </div>
           <div style="font-size:11.5px;color:var(--muted);line-height:1.48;">
-            • <strong>Devices on v1.5.0+</strong>: Triggers native high-speed <strong>USB-FOTA (921600 bps + CRC-16)</strong> with real-time progress bar on the physical LED Matrix.<br/>
+            • <strong>MAICXEN EDGE Native USB-FOTA</strong>: Streams the firmware binary at <strong>921600 bps with CRC-16/CCITT verification</strong> directly into the secondary OTA slot with rollback protection.<br/>
             • <strong>Legacy / Factory Blank ESP32</strong>: Automatically falls back to <strong>esptool-js Bootloader</strong> mode without erasing saved Wi-Fi or NVS settings.
           </div>
         </div>

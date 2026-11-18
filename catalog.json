@@ -1,7 +1,7 @@
 {
   "organization": "MAICXEN EDGE",
   "domain": "iot.maicxen.it",
-  "updated_at": "2026-11-18T08:37:06Z",
+  "updated_at": "2026-11-18T10:24:59Z",
   "products": [
     {
       "product_id": "smarty",
@@ -15,7 +15,7 @@
           "model_name": "Smarty 23×5 RGB Matrix (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.5.0",
+          "latest_version": "1.5.1",
           "version_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/bootloader.bin",
@@ -32,7 +32,7 @@
             "local_web",
             "alexa"
           ],
-          "notes": "Rilascio v1.5.0: Procedura FOTA Nativa via USB Serial ad alta velocita (921600 baud con CRC16, barra di progresso LED 23x5 sul dispositivo e Dual-OTA Rollback Protection) con rilevamento automatico della versione e fallback automatico a esptool-js per i firmware precedenti."
+          "notes": "v1.5.1 — TLS concurrency guard between FOTA and Supabase Telemetry, dual URL/firmware_url manifest parser & stability patch."
         }
       ]
     },
@@ -48,7 +48,7 @@
           "model_name": "AledA Smart LED Controller (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.0.0",
+          "latest_version": "1.0.1",
           "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/bootloader.bin",
@@ -63,14 +63,14 @@
             "local_web",
             "alexa"
           ],
-          "notes": "v1.0.0 — MAICXEN EDGE ecosystem release for AledA Smart LED Controller."
+          "notes": "v1.0.1 — NVS on/off timestamp & uptime persistence, periodic 24h FOTA & Pre-Matter TLS optimization."
         },
         {
           "model_id": "esp32s3-matter",
           "model_name": "AledA Matter over Wi-Fi Controller (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.0.0",
+          "latest_version": "1.0.1",
           "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/bootloader.bin",
@@ -84,7 +84,7 @@
             "cloud_fota",
             "local_web"
           ],
-          "notes": "v1.0.0 — Native Matter-over-WiFi 8MB Dual-OTA build for Apple HomeKit, Google Home & Alexa."
+          "notes": "v1.0.1 — NVS on/off timestamp & uptime persistence, periodic 24h FOTA & Pre-Matter TLS optimization."
         }
       ]
     }

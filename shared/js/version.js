@@ -21,15 +21,20 @@ export function inferProductId(devOrHwId) {
     const explicit = devOrHwId.product_id || devOrHwId.product;
     if (explicit) {
       const low = String(explicit).toLowerCase();
-      if (!low.includes("smarty") && !low.includes("aleda")) return low;
-      if (low === "smarty" || low === "aleda") return low;
+      if (low.includes("onir")) return "onir";
+      if (low.includes("aleda")) return "aleda";
+      if (low.includes("smarty")) return "smarty";
+      return low;
     }
     const hwUpper = String(devOrHwId.hw_id || "").toUpperCase();
+    if (hwUpper.startsWith("ONIR") || hwUpper.startsWith("IR-")) return "onir";
     if (hwUpper.startsWith("ALEDA") || hwUpper.startsWith("AL-")) return "aleda";
     return "smarty";
   }
   const hwUpper = String(devOrHwId || "").toUpperCase();
-  return hwUpper.startsWith("ALEDA") || hwUpper.startsWith("AL-") ? "aleda" : "smarty";
+  if (hwUpper.startsWith("ONIR") || hwUpper.startsWith("IR-")) return "onir";
+  if (hwUpper.startsWith("ALEDA") || hwUpper.startsWith("AL-")) return "aleda";
+  return "smarty";
 }
 
 export function fmtTs(epochSec) {

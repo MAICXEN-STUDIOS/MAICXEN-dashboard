@@ -4,7 +4,7 @@ import {
   SUPABASE_ANON_KEY,
   USB_FOTA_MIN_VERSION
 } from "../../shared/js/config.js";
-import { compareVersions, isVersionAtLeast, fmtDur } from "../../shared/js/version.js";
+import { compareVersions, isVersionAtLeast, fmtDur, inferProductId } from "../../shared/js/version.js";
 import { buildStylizedPcbSvg } from "../../shared/js/pcb-visualizer.js";
 import { DEFAULT_CATALOG_PRODUCTS, fetchPublicCatalog } from "../../shared/js/catalog-data.js";
 import {
@@ -142,8 +142,7 @@ function selectProduct(productId, preferredModelId = null) {
 
 function autoMatchProductFromTelemetry(devInfo, preserveModelSelection = false) {
   if (!devInfo) return;
-  const hwStr = String(devInfo.hw_id || "").toUpperCase();
-  const detectedProd = (devInfo.product_id || (hwStr.startsWith("ALEDA") || hwStr.startsWith("AL-") ? "aleda" : "smarty")).toLowerCase();
+  const detectedProd = inferProductId(devInfo);
   let targetModel = devInfo.model_id || null;
   if (preserveModelSelection && selectedProduct && selectedProduct.product_id === detectedProd && selectedModel) {
     targetModel = selectedModel.model_id;

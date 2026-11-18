@@ -1,11 +1,14 @@
 {
   "organization": "MAICXEN EDGE",
   "domain": "iot.maicxen.it",
-  "updated_at": "2026-11-18T10:24:59Z",
+  "flasher_version": "2.1.0",
+  "dashboard_version": "3.1.0",
+  "updated_at": "2026-11-18T19:05:08Z",
   "products": [
     {
       "product_id": "smarty",
       "product_name": "Smarty",
+      "latest_version": "1.6.0",
       "tagline": "23×5 Addressable RGB Matrix · Capacitive Touch · Ambient Lux · Hybrid USB/Cloud FOTA",
       "icon": "grid",
       "accent": "#f59e0b",
@@ -15,7 +18,7 @@
           "model_name": "Smarty 23×5 RGB Matrix (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.5.1",
+          "latest_version": "1.6.0",
           "version_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/bootloader.bin",
@@ -32,23 +35,24 @@
             "local_web",
             "alexa"
           ],
-          "notes": "v1.5.1 — TLS concurrency guard between FOTA and Supabase Telemetry, dual URL/firmware_url manifest parser & stability patch."
+          "notes": "v1.6.0 — Minor release: streamlined direct Supabase telemetry, zero-latency local control architecture & USB-FOTA 921600 bps."
         }
       ]
     },
     {
       "product_id": "aleda",
       "product_name": "AledA",
-      "tagline": "Architectural Addressable LED Luminaire Controller · Local Web UI · Matter / Voice Sync",
+      "latest_version": "1.1.0",
+      "tagline": "Architectural 4-Relay, 4-Dimmer & 3-Strip Controller · Local Web UI · Matter / Voice Sync",
       "icon": "sun",
       "accent": "#38bdf8",
       "models": [
         {
           "model_id": "esp32s3-std",
-          "model_name": "AledA Smart LED Controller (ESP32-S3)",
+          "model_name": "AledA Standard Controller (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.0.1",
+          "latest_version": "1.1.0",
           "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/bootloader.bin",
@@ -56,21 +60,22 @@
           "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/boot_app0.bin",
           "capabilities": [
             "power",
-            "brightness",
-            "rgb",
-            "effects",
+            "relays",
+            "dimmers",
+            "strips",
+            "usb_fota",
             "cloud_fota",
             "local_web",
             "alexa"
           ],
-          "notes": "v1.0.1 — NVS on/off timestamp & uptime persistence, periodic 24h FOTA & Pre-Matter TLS optimization."
+          "notes": "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
         },
         {
           "model_id": "esp32s3-matter",
           "model_name": "AledA Matter over Wi-Fi Controller (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.0.1",
+          "latest_version": "1.1.0",
           "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/bootloader.bin",
@@ -78,13 +83,15 @@
           "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/boot_app0.bin",
           "capabilities": [
             "power",
-            "brightness",
-            "rgb",
+            "relays",
+            "dimmers",
+            "strips",
             "matter",
+            "usb_fota",
             "cloud_fota",
             "local_web"
           ],
-          "notes": "v1.0.1 — NVS on/off timestamp & uptime persistence, periodic 24h FOTA & Pre-Matter TLS optimization."
+          "notes": "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
         }
       ]
     }

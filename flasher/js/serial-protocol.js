@@ -48,9 +48,9 @@ export async function openAndProbeOnSamePort(port, preferredProductId, logLine) 
   const nativeUsb = isNativeEspUsb(port);
   const bauds = nativeUsb
     ? [115200]
-    : preferredProductId === "aleda"
-    ? [115200, 9600]
-    : [9600, 115200];
+    : preferredProductId === "smarty"
+    ? [9600, 115200]
+    : [115200, 9600];
 
   for (const baud of bauds) {
     let reader = null;
@@ -354,15 +354,20 @@ export async function runClassicEsptoolFlash({
     logLine(`[Bootloader] Detected chip: ${chipName}`);
 
     const baseDir = `./firmware/${selectedProduct.product_id}/${selectedModel.model_id}`;
-    const offs = selectedModel.offsets || [0, 32768, 69632, 131072];
+    const isClassicEsp32 = String(selectedModel.chip || "").toUpperCase() === "ESP32";
+    const defaultOffsets = isClassicEsp32 ? [4096, 32768, 57344, 65536] : [0, 32768, 69632, 131072];
+    const offs = Array.isArray(selectedModel.offsets) && selectedModel.offsets.length === 4
+      ? selectedModel.offsets
+      : defaultOffsets;
+    const fmtHex = (v) => `0x${Number(v).toString(16).toUpperCase().padStart(4, "0")}`;
     const parts = [
-      { path: selectedModel.bootloader_url || `${baseDir}/bootloader.bin`, offset: offs[0], label: "Bootloader (0x0000)" },
-      { path: selectedModel.partitions_url || `${baseDir}/partitions.bin`, offset: offs[1], label: "Partition Table (0x8000)" },
-      { path: selectedModel.boot_app0_url || `${baseDir}/boot_app0.bin`, offset: offs[2], label: "OTA Selector (0x11000)" },
+      { path: selectedModel.bootloader_url || `${baseDir}/bootloader.bin`, offset: offs[0], label: `Bootloader (${fmtHex(offs[0])})` },
+      { path: selectedModel.partitions_url || `${baseDir}/partitions.bin`, offset: offs[1], label: `Partition Table (${fmtHex(offs[1])})` },
+      { path: selectedModel.boot_app0_url || `${baseDir}/boot_app0.bin`, offset: offs[2], label: `OTA Selector (${fmtHex(offs[2])})` },
       {
         path: selectedModel.firmware_url || `${baseDir}/firmware.bin`,
         offset: offs[3],
-        label: `${selectedProduct.product_name} v${selectedModel.latest_version} (0x20000)`
+        label: `${selectedProduct.product_name} v${selectedModel.latest_version} (${fmtHex(offs[3])})`
       }
     ];
 

@@ -1,14 +1,14 @@
 {
   "organization": "MAICXEN EDGE",
   "domain": "iot.maicxen.it",
-  "flasher_version": "2.1.0",
+  "flasher_version": "2.2.0",
   "dashboard_version": "3.1.0",
-  "updated_at": "2026-11-18T19:05:08Z",
+  "updated_at": "2026-11-18T19:24:17Z",
   "products": [
     {
       "product_id": "smarty",
       "product_name": "Smarty",
-      "latest_version": "1.6.0",
+      "latest_version": "1.6.1",
       "tagline": "23×5 Addressable RGB Matrix · Capacitive Touch · Ambient Lux · Hybrid USB/Cloud FOTA",
       "icon": "grid",
       "accent": "#f59e0b",
@@ -18,7 +18,7 @@
           "model_name": "Smarty 23×5 RGB Matrix (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.6.0",
+          "latest_version": "1.6.1",
           "version_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/bootloader.bin",
@@ -35,14 +35,14 @@
             "local_web",
             "alexa"
           ],
-          "notes": "v1.6.0 — Minor release: streamlined direct Supabase telemetry, zero-latency local control architecture & USB-FOTA 921600 bps."
+          "notes": "v1.6.1 — Enabled native ESP32-S3 USB-CDC (HWCDC) alongside UART0 for zero-reset Live USB Telemetry and WebSerial FOTA."
         }
       ]
     },
     {
       "product_id": "aleda",
       "product_name": "AledA",
-      "latest_version": "1.1.0",
+      "latest_version": "1.1.1",
       "tagline": "Architectural 4-Relay, 4-Dimmer & 3-Strip Controller · Local Web UI · Matter / Voice Sync",
       "icon": "sun",
       "accent": "#38bdf8",
@@ -52,7 +52,7 @@
           "model_name": "AledA Standard Controller (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.1.0",
+          "latest_version": "1.1.1",
           "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/bootloader.bin",
@@ -68,14 +68,14 @@
             "local_web",
             "alexa"
           ],
-          "notes": "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
+          "notes": "v1.1.1 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
         },
         {
           "model_id": "esp32s3-matter",
           "model_name": "AledA Matter over Wi-Fi Controller (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
-          "latest_version": "1.1.0",
+          "latest_version": "1.1.1",
           "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/bootloader.bin",
@@ -91,7 +91,7 @@
             "cloud_fota",
             "local_web"
           ],
-          "notes": "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
+          "notes": "v1.1.1 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
         }
       ]
     }

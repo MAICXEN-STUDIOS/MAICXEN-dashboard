@@ -3,7 +3,7 @@
   "domain": "iot.maicxen.it",
   "flasher_version": "2.3.0",
   "dashboard_version": "3.1.0",
-  "updated_at": "2026-11-18T20:43:04Z",
+  "updated_at": "2026-11-18T21:04:44Z",
   "products": [
     {
       "product_id": "smarty",
@@ -98,7 +98,7 @@
     {
       "product_id": "onir",
       "product_name": "onIR",
-      "latest_version": "1.0.0",
+      "latest_version": "1.0.1",
       "tagline": "Universal Matter-over-WiFi IR Bridge · NVS ON/OFF Profiles · Live IR Learning · Dual-Core",
       "icon": "radio",
       "accent": "#a855f7",
@@ -114,7 +114,7 @@
             57344,
             65536
           ],
-          "latest_version": "1.0.0",
+          "latest_version": "1.0.1",
           "version_url": "https://iot.maicxen.it/firmware/onir/esp32-matter/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/onir/esp32-matter/firmware.bin",
           "bootloader_url": "https://iot.maicxen.it/firmware/onir/esp32-matter/bootloader.bin",
@@ -130,7 +130,7 @@
             "cloud_fota",
             "local_web"
           ],
-          "notes": "v1.0.0 — Initial MAICXEN EDGE release: Universal Matter-over-WiFi IR Bridge with NVS ON/OFF IR profiles, live IR learning, dual-core FreeRTOS architecture, Local Web UI, Pre-Matter FOTA, USB-FOTA & Supabase Fleet Telemetry."
+          "notes": "v1.0.1 — Fix Web UI IR form reset caused by ambient RX frames during polling + stricter IR noise filter (>= 12 edges)."
         }
       ]
     }

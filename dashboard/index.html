@@ -3,348 +3,444 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#070a0f" />
+  <meta name="theme-color" content="#000000" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>MAICXEN EDGE — Enterprise Fleet &amp; Product Console</title>
+  <link rel="icon" type="image/png" href="../shared/assets/logo-maicxen-edge-color.png" />
+  <title>MAICXEN EDGE — Fleet Console</title>
   <link rel="stylesheet" href="../shared/css/tokens.css" />
   <link rel="stylesheet" href="./css/dashboard.css" />
 </head>
 <body>
 
-  <!-- INVITE-ONLY SUPABASE AUTH GATE -->
+  <!-- INVITE-ONLY SUPABASE AUTH GATE (Apple-Minimalist Sheet) -->
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
-      <div class="vendor-tag">
-        <svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        MAICXEN EDGE &bull; FLEET ACCESS
-      </div>
-      <h2 style="font-size:21px; font-weight:800; margin-bottom:4px;">MAICXEN EDGE Console</h2>
-      <p style="font-size:12.5px; color:var(--muted-dash);">
-        Unified multi-product IoT fleet management with strict invite-only RBAC (<strong>Admin</strong>, <strong>Editor</strong>, <strong>Viewer</strong>).
-      </p>
+      <img
+        src="../shared/assets/logo-maicxen-edge-color.png"
+        alt="MAICXEN EDGE"
+        class="auth-logo"
+      />
+      <h2 class="auth-title">Fleet Console</h2>
+      <p class="auth-sub">Invite-only multi-product IoT management</p>
 
       <div class="auth-mode-tabs" id="authTabs">
-        <button class="auth-mode-tab active" id="tabBtnLogin" onclick="setAuthMode('login', this)">Sign In</button>
-        <button class="auth-mode-tab" id="tabBtnSignup" onclick="setAuthMode('signup', this)">Register</button>
-        <button class="auth-mode-tab" id="tabBtnReset" onclick="setAuthMode('reset', this)">Recover</button>
+        <button type="button" class="auth-mode-tab active" id="tabBtnLogin" onclick="setAuthMode('login', this)">Sign In</button>
+        <button type="button" class="auth-mode-tab" id="tabBtnSignup" onclick="setAuthMode('signup', this)">Register</button>
+        <button type="button" class="auth-mode-tab" id="tabBtnReset" onclick="setAuthMode('reset', this)">Recover</button>
       </div>
 
-      <form onsubmit="handleAuthSubmit(event)" style="display:flex; flex-direction:column; gap:10px; text-align:left;">
-        <div id="usernameFieldWrap" style="display:none; flex-direction:column; gap:4px;">
-          <label style="font-size:11.5px; color:var(--muted-dash);">Username</label>
+      <form onsubmit="handleAuthSubmit(event)" class="auth-form">
+        <div id="usernameFieldWrap" class="field-group" style="display:none;">
+          <label for="authUsername">Username</label>
           <input type="text" id="authUsername" placeholder="e.g. emanuele_admin" />
         </div>
 
-        <div id="emailFieldWrap" style="display:flex; flex-direction:column; gap:4px;">
-          <label style="font-size:11.5px; color:var(--muted-dash);">Authorized Email Address</label>
+        <div id="emailFieldWrap" class="field-group">
+          <label for="authEmail">Authorized Email</label>
           <input type="email" id="authEmail" placeholder="name@domain.com" required autocomplete="email" />
         </div>
 
-        <div id="passFieldWrap" style="display:flex; flex-direction:column; gap:4px;">
-          <label style="font-size:11.5px; color:var(--muted-dash);" id="passFieldLabel">Password</label>
+        <div id="passFieldWrap" class="field-group">
+          <label for="authPass" id="passFieldLabel">Password</label>
           <input type="password" id="authPass" placeholder="••••••••" minlength="6" autocomplete="current-password" />
         </div>
 
-        <button type="submit" class="btn-primary" id="authSubmitBtn" style="padding:11px; margin-top:4px;">
-          Sign In to Dashboard
-        </button>
+        <button type="submit" class="primary-btn" id="authSubmitBtn">Sign In to Dashboard</button>
       </form>
 
       <div id="authFeedback" class="auth-alert"></div>
     </div>
   </div>
 
-  <!-- MINIMAL FLEET DASHBOARD SHELL -->
+  <!-- AUTHENTICATED FLEET CONSOLE SHELL -->
   <div class="app-shell" id="appWrap">
-    <nav class="navbar">
-      <div class="brand-left">
-        <div>
-          <h1 style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            MAICXEN EDGE
-            <span class="pill cyan" style="font-size:10px; padding:2px 8px;">Dashboard v3.1.0</span>
-            <span class="pill green" id="streamStatusPill">LIVE</span>
-          </h1>
-          <span style="font-size:11.5px; color:var(--muted-dash);" id="latestFwPill">Multi-Product Ecosystem</span>
-        </div>
-      </div>
-
-      <div class="nav-tabs">
-        <button class="nav-tab active" onclick="switchSection('devices', this)">
-          <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          Devices
-        </button>
-        <button class="nav-tab" onclick="switchSection('catalog', this)">
-          <svg class="ico" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          Products &amp; Catalog
-        </button>
-        <button class="nav-tab" onclick="switchSection('actions', this)">
-          <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          LAN Discovery
-        </button>
-        <button class="nav-tab" onclick="switchSection('logs', this)">
-          <svg class="ico" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Activity Log
-        </button>
-        <button class="nav-tab" id="navUsersBtn" style="display:none;" onclick="switchSection('users', this)">
-          <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Users &amp; Roles
-        </button>
-        <button class="nav-tab" id="navProfileBtn" onclick="switchSection('settings', this)">
-          <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Profile
-        </button>
-        <a href="../" class="nav-tab" style="text-decoration:none; color:var(--cyan);" title="Open Public Universal Web Flasher">
-          <svg class="ico" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Web Flasher &nearr;
-        </a>
-      </div>
-
-      <div class="user-chip" onclick="switchSection('settings', document.getElementById('navProfileBtn'))" title="Open Profile Settings">
-        <div class="avatar-img" id="navAvatarBox">U</div>
-        <div style="text-align:left;">
-          <div style="font-size:12px; font-weight:700; line-height:1.1;" id="navUsername">--</div>
-          <span class="pill purple" id="userRoleBadge" style="font-size:9px; padding:1px 6px;">VIEWER</span>
-        </div>
-      </div>
-    </nav>
-
-    <!-- COMPACT KPI BAR -->
-    <div class="kpi-strip">
-      <div class="kpi-mini"><span class="lbl">Registered Devices</span><span class="num" id="kpiTotal">0</span></div>
-      <div class="kpi-mini"><span class="lbl">Online Now</span><span class="num" style="color:var(--green);" id="kpiOnline">0</span></div>
-      <div class="kpi-mini"><span class="lbl">Powered ON</span><span class="num" style="color:var(--cyan);" id="kpiPoweredOn">0</span></div>
-      <div class="kpi-mini"><span class="lbl">Update Pending</span><span class="num" style="color:var(--amber);" id="kpiOutdated">0</span></div>
-    </div>
-
-    <!-- SECTION 1: DEVICES -->
-    <section class="section-view active" id="sec-devices">
-      <div class="filter-bar">
-        <select id="productFilter" onchange="renderFleet()" style="min-width:170px;">
-          <option value="all">All Products (Smarty, AledA, onIR...)</option>
-          <option value="smarty">Smarty</option>
-          <option value="aleda">AledA</option>
-          <option value="onir">onIR</option>
-        </select>
-        <input type="text" id="searchFilter" placeholder="Filter by name, Hardware ID, model, or IP..." oninput="renderFleet()" style="width:270px;" />
-        <button onclick="syncWithCloudAndDb()">
-          <svg class="ico" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          Refresh Fleet
-        </button>
-      </div>
-      <div class="fleet-grid" id="devicesGrid"></div>
-    </section>
-
-    <!-- SECTION 1B: PRODUCTS & CATALOG MANAGEMENT -->
-    <section class="section-view" id="sec-catalog">
-      <div class="panel-box role-admin" id="adminCatalogBox">
-        <h3>Register or Update MAICXEN EDGE Product / Model Variant</h3>
-        <p>Add or update a product line or hardware model variant. <strong>Versioning Rule:</strong> every product line shares one unified version across all of its models (e.g., all AledA variants share one version while serving distinct firmware binaries).</p>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)); gap:8px; margin-bottom:10px;">
-          <input type="text" id="catProdId" placeholder="Product ID (e.g. smarty, aleda)" />
-          <input type="text" id="catProdName" placeholder="Product Name (e.g. Smarty, AledA)" />
-          <input type="text" id="catModelId" placeholder="Model ID (e.g. esp32s3-std)" />
-          <input type="text" id="catModelName" placeholder="Model Title (e.g. AledA Matter S3)" />
-          <input type="text" id="catChip" placeholder="MCU Chip (default: ESP32-S3)" value="ESP32-S3" />
-          <input type="text" id="catHwRev" placeholder="HW Rev (e.g. 1.0)" value="1.0" />
-          <input type="text" id="catVersion" placeholder="Product Version (e.g. 1.6.1)" value="1.0.0" />
-          <input type="text" id="catCaps" placeholder="Capabilities (comma-separated)" value="power,brightness,rgb,cloud_fota,local_web" />
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <input type="text" id="catNotes" placeholder="Release notes / description..." style="flex:1; min-width:240px;" />
-          <button class="btn-primary" onclick="saveCatalogEntry()">Save Product / Variant to Cloud</button>
-        </div>
-      </div>
-
-      <div class="panel-box">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <h3>MAICXEN EDGE Product &amp; Firmware Catalog</h3>
-            <p style="margin-bottom:0;">Synchronized across Supabase Cloud and the Universal Web Flasher.</p>
+    <!-- Sticky Apple-style Translucent Navigation -->
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <img
+            src="../shared/assets/logo-maicxen-edge-color.png"
+            alt="MAICXEN EDGE"
+            class="brand-logo"
+          />
+          <div class="brand-meta">
+            <span class="brand-product">Fleet Console</span>
+            <span class="brand-ver">v3.2.0</span>
+            <span class="live-pill" id="streamStatusPill">LIVE</span>
           </div>
-          <button onclick="loadProductCatalog()">Refresh Catalog</button>
         </div>
-        <div style="overflow-x:auto;">
-          <table class="users-table">
-            <thead>
-              <tr>
-                <th>Product Line</th>
-                <th>Model / Variant</th>
-                <th>MCU &amp; Rev</th>
-                <th>Product Version</th>
-                <th>Capabilities</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="catalogTableBody"></tbody>
-          </table>
+
+        <nav class="view-segmented" role="tablist" aria-label="Console sections">
+          <button type="button" class="nav-tab active" onclick="switchSection('devices', this)">Devices</button>
+          <button type="button" class="nav-tab" onclick="switchSection('catalog', this)">Catalog</button>
+          <button type="button" class="nav-tab" onclick="switchSection('actions', this)">Discovery</button>
+          <button type="button" class="nav-tab" onclick="switchSection('logs', this)">Activity</button>
+          <button type="button" class="nav-tab" id="navUsersBtn" style="display:none;" onclick="switchSection('users', this)">Users</button>
+        </nav>
+
+        <div class="topbar-actions">
+          <a href="../" class="nav-link" title="Open Public Web Flasher">
+            <span>Flasher</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17L17 7"/><path d="M7 7h10v10"/>
+            </svg>
+          </a>
+          <button type="button" class="user-chip" id="navProfileBtn" onclick="switchSection('settings', this)" title="Profile &amp; Settings">
+            <div class="avatar-img" id="navAvatarBox">U</div>
+            <div class="user-chip-meta">
+              <span class="user-chip-name" id="navUsername">--</span>
+              <span class="pill purple" id="userRoleBadge">VIEWER</span>
+            </div>
+          </button>
         </div>
       </div>
-    </section>
+    </header>
 
-    <!-- SECTION 2: LAN DISCOVERY -->
-    <section class="section-view" id="sec-actions">
-      <div class="panel-box">
-        <h3>Direct Local Network Discovery (LAN IP Probe)</h3>
-        <p>Query any MAICXEN EDGE device directly on your local Wi-Fi network via its IPv4 address (<code>/api/status</code>) to refresh telemetry and open its Local Web UI. Direct hardware control is handled natively with zero latency via the device's Local Web UI, Alexa, or Matter.</p>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <input type="text" id="lanProbeIp" placeholder="Local IP (e.g. 192.168.1.6 or 192.168.0.111)" style="width:280px;" />
-          <button class="btn-cyan" onclick="probeLocalDevice()">Probe Local IP</button>
-        </div>
+    <main class="main-wrap">
+      <!-- Subtle Ecosystem Subtitle & Hairline Metric Bar -->
+      <div class="metrics-bar">
+        <button type="button" class="metric-item" onclick="quickFilterFleet('all')" title="Show all devices">
+          <span class="metric-num" id="kpiTotal">0</span>
+          <span class="metric-lbl">Devices</span>
+        </button>
+        <button type="button" class="metric-item" onclick="quickFilterFleet('online')" title="Filter online devices">
+          <span class="metric-num green" id="kpiOnline">0</span>
+          <span class="metric-lbl">Online</span>
+        </button>
+        <button type="button" class="metric-item" onclick="quickFilterFleet('active')" title="Filter powered-on devices">
+          <span class="metric-num blue" id="kpiPoweredOn">0</span>
+          <span class="metric-lbl">Active</span>
+        </button>
+        <button type="button" class="metric-item" onclick="quickFilterFleet('outdated')" title="Filter outdated devices">
+          <span class="metric-num amber" id="kpiOutdated">0</span>
+          <span class="metric-lbl">Updates</span>
+        </button>
+        <div class="metrics-fw-summary" id="latestFwPill">Multi-Product Ecosystem</div>
       </div>
-    </section>
 
-    <!-- SECTION 3: ACTIVITY LOG -->
-    <section class="section-view" id="sec-logs">
-      <div class="panel-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <div>
-            <h3>Chronological Fleet Activity Log</h3>
-            <p style="margin-bottom:0;">Cloud-synchronized audit log of power events, boot cycles, and firmware lifecycle telemetry.</p>
+      <!-- ================================================================ -->
+      <!-- SECTION 1: DEVICES (AIRY GROUPED LIST)                           -->
+      <!-- ================================================================ -->
+      <section class="section-view active" id="sec-devices">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="select-wrap">
+              <select id="productFilter" class="apple-select" onchange="renderFleet()">
+                <option value="all">All Products</option>
+                <option value="smarty">Smarty</option>
+                <option value="aleda">AledA</option>
+                <option value="onir">onIR</option>
+              </select>
+              <svg class="select-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+
+            <div class="select-wrap">
+              <select id="statusFilter" class="apple-select" onchange="renderFleet()">
+                <option value="all">All Status</option>
+                <option value="online">Online Only</option>
+                <option value="offline">Offline Only</option>
+                <option value="active">Powered ON</option>
+                <option value="outdated">Update Available</option>
+              </select>
+              <svg class="select-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
           </div>
-          <button class="role-admin" onclick="clearEventLog()">Clear Log (Admin)</button>
-        </div>
-        <div class="events-log" id="eventsLog"></div>
-      </div>
-    </section>
 
-    <!-- SECTION 4: USERS & ROLES MANAGEMENT (ADMIN ONLY) -->
-    <section class="section-view" id="sec-users">
-      <div class="panel-box">
-        <h3>Pre-Authorize User Email &amp; Assign Role</h3>
-        <p>Users <strong>cannot register</strong> unless their email address is added here first. Once added, they can switch to the <em>Register</em> tab to set their username and password.</p>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <input type="email" id="inviteEmailInput" placeholder="user@example.com" style="width:260px;" />
-          <select id="inviteRoleSelect">
-            <option value="viewer">Viewer (Read-Only Telemetry)</option>
-            <option value="editor">Editor (Control Modes, Colors &amp; Text)</option>
-            <option value="admin">Admin (Full System &amp; User Control)</option>
-          </select>
-          <button class="btn-primary" onclick="assignRoleByEmail()">Authorize Email</button>
-        </div>
-      </div>
-
-      <div class="panel-box">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <h3>Authorized Accounts &amp; Access Control</h3>
-            <p style="margin-bottom:0;">Modify role hierarchy or temporarily ban/unban user accounts.</p>
+          <div class="toolbar-right">
+            <input type="text" id="searchFilter" class="apple-input search-input" placeholder="Search alias, ID, or IP…" oninput="renderFleet()" />
+            <button type="button" class="pill-btn" onclick="syncWithCloudAndDb()">Refresh</button>
           </div>
-          <button onclick="loadUsersList()">Refresh Users</button>
         </div>
-        <div style="overflow-x:auto;">
-          <table class="users-table">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Joined</th>
-                <th>Admin Actions</th>
-              </tr>
-            </thead>
-            <tbody id="usersTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
 
-    <!-- SECTION 5: PROFILE, AVATAR, PASSWORD & BACKUP -->
-    <section class="section-view" id="sec-settings">
-      <div class="panel-box">
-        <h3>User Profile &amp; Cloud Avatar</h3>
-        <p>Your profile picture and username are stored on Supabase and synced across all your devices.</p>
-        <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
-          <div class="avatar-img" id="profileAvatarPreview" style="width:68px; height:68px; font-size:24px;">U</div>
-          <div style="display:flex; flex-direction:column; gap:8px;">
-            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-              <input type="text" id="profileUsernameInput" placeholder="Username..." style="width:210px;" />
-              <button class="btn-cyan" onclick="saveProfileUsername()">Save Username</button>
-              <button onclick="document.getElementById('avatarFileInput').click()">Upload Avatar Photo</button>
+        <div class="fleet-list" id="devicesGrid"></div>
+      </section>
+
+      <!-- ================================================================ -->
+      <!-- SECTION 2: PRODUCTS & CATALOG                                    -->
+      <!-- ================================================================ -->
+      <section class="section-view" id="sec-catalog">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Product Catalog</h2>
+            <p class="section-sub">Unified firmware releases synchronized across Supabase Cloud and the Web Flasher. Hover or click a version pill to inspect release notes.</p>
+          </div>
+          <button type="button" class="pill-btn" onclick="loadProductCatalog()">Refresh Catalog</button>
+        </div>
+
+        <details class="disclosure-row role-admin" id="adminCatalogBox">
+          <summary>
+            <span>+ Register or Update Product Variant (Admin)</span>
+            <span class="disclosure-hint">Expand</span>
+          </summary>
+          <div class="disclosure-body">
+            <p class="form-hint">Every product line shares a single unified version across all of its hardware models while serving distinct binaries.</p>
+            <div class="form-grid">
+              <input type="text" id="catProdId" class="apple-input" placeholder="Product ID (e.g. aleda)" />
+              <input type="text" id="catProdName" class="apple-input" placeholder="Product Name (e.g. AledA)" />
+              <input type="text" id="catModelId" class="apple-input" placeholder="Model ID (e.g. esp32s3-matter)" />
+              <input type="text" id="catModelName" class="apple-input" placeholder="Model Title" />
+              <input type="text" id="catChip" class="apple-input" placeholder="Chip (ESP32-S3)" value="ESP32-S3" />
+              <input type="text" id="catHwRev" class="apple-input" placeholder="HW Rev (1.0)" value="1.0" />
+              <input type="text" id="catVersion" class="apple-input" placeholder="Version (1.0.0)" value="1.0.0" />
+              <input type="text" id="catCaps" class="apple-input" placeholder="Capabilities (comma-separated)" value="power,brightness,rgb,cloud_fota,local_web" />
+            </div>
+            <div class="form-footer">
+              <input type="text" id="catNotes" class="apple-input" placeholder="Release notes / changelog…" style="flex:1;" />
+              <button type="button" class="pill-btn primary" onclick="saveCatalogEntry()">Save to Cloud</button>
+            </div>
+          </div>
+        </details>
+
+        <div class="list-group table-group">
+          <div class="table-scroll">
+            <table class="apple-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Model / Variant</th>
+                  <th>MCU</th>
+                  <th>Version</th>
+                  <th>Capabilities</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="catalogTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================ -->
+      <!-- SECTION 3: LAN DISCOVERY                                         -->
+      <!-- ================================================================ -->
+      <section class="section-view" id="sec-actions">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">LAN Discovery</h2>
+            <p class="section-sub">Query any MAICXEN EDGE device directly on your local Wi-Fi network via <code>/api/status</code> to refresh telemetry and open its Local Web UI.</p>
+          </div>
+        </div>
+
+        <div class="list-group">
+          <div class="list-row">
+            <div class="list-row-label">
+              <span class="row-title">Direct IPv4 Probe</span>
+              <span class="row-sub">Requires same local Wi-Fi network &amp; CORS-enabled firmware</span>
+            </div>
+            <div class="list-row-control row-inline">
+              <input type="text" id="lanProbeIp" class="apple-input mono" placeholder="192.168.1.6" style="width:200px;" />
+              <button type="button" class="pill-btn primary" onclick="probeLocalDevice()">Probe IP</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================ -->
+      <!-- SECTION 4: ACTIVITY LOG                                          -->
+      <!-- ================================================================ -->
+      <section class="section-view" id="sec-logs">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Activity Log</h2>
+            <p class="section-sub">Chronological cloud audit trail of boot cycles, power state transitions, and firmware lifecycle events.</p>
+          </div>
+          <div class="row-inline">
+            <input type="text" id="logSearchFilter" class="apple-input" placeholder="Filter by ID or event…" oninput="renderEventLogs()" style="width:200px;" />
+            <button type="button" class="pill-btn" onclick="exportEventLog()">Export .txt</button>
+            <button type="button" class="pill-btn danger role-admin" onclick="clearEventLog()">Clear Log</button>
+          </div>
+        </div>
+
+        <div class="list-group">
+          <div class="events-log" id="eventsLog"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================ -->
+      <!-- SECTION 5: USERS & ROLES (ADMIN ONLY)                            -->
+      <!-- ================================================================ -->
+      <section class="section-view" id="sec-users">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Users &amp; Roles</h2>
+            <p class="section-sub">Pre-authorize email addresses before registration and manage RBAC permissions.</p>
+          </div>
+          <button type="button" class="pill-btn" onclick="loadUsersList()">Refresh Users</button>
+        </div>
+
+        <div class="group-caption">Pre-Authorize New Account</div>
+        <div class="list-group" style="margin-bottom:28px;">
+          <div class="list-row">
+            <div class="list-row-label">
+              <span class="row-title">Authorize Email</span>
+              <span class="row-sub">Users can register only after their email is invited here</span>
+            </div>
+            <div class="list-row-control row-inline">
+              <input type="email" id="inviteEmailInput" class="apple-input" placeholder="user@example.com" style="width:210px;" />
+              <div class="select-wrap" style="min-width:150px;">
+                <select id="inviteRoleSelect" class="apple-select">
+                  <option value="viewer">Viewer</option>
+                  <option value="editor">Editor</option>
+                  <option value="admin">Admin</option>
+                </select>
+                <svg class="select-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <button type="button" class="pill-btn primary" onclick="assignRoleByEmail()">Authorize</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="group-caption">Authorized Accounts</div>
+        <div class="list-group table-group">
+          <div class="table-scroll">
+            <table class="apple-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================ -->
+      <!-- SECTION 6: PROFILE & SETTINGS                                    -->
+      <!-- ================================================================ -->
+      <section class="section-view" id="sec-settings">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Account &amp; Settings</h2>
+            <p class="section-sub" id="profileEmailInfo">--</p>
+          </div>
+          <button type="button" class="pill-btn danger" onclick="logoutUser()">Sign Out</button>
+        </div>
+
+        <div class="group-caption">Profile &amp; Avatar</div>
+        <div class="list-group" style="margin-bottom:28px;">
+          <div class="list-row">
+            <div class="row-inline" style="gap:16px;">
+              <div class="avatar-img lg" id="profileAvatarPreview">U</div>
+              <div class="list-row-label">
+                <span class="row-title">Display Name &amp; Photo</span>
+                <span class="row-sub">Synced across your MAICXEN EDGE sessions</span>
+              </div>
+            </div>
+            <div class="list-row-control row-inline">
+              <input type="text" id="profileUsernameInput" class="apple-input" placeholder="Username…" style="width:180px;" />
+              <button type="button" class="pill-btn primary" onclick="saveProfileUsername()">Save</button>
+              <button type="button" class="pill-btn" onclick="document.getElementById('avatarFileInput').click()">Photo…</button>
               <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)" />
             </div>
-            <span style="font-size:12px; color:var(--muted-dash);" id="profileEmailInfo">--</span>
           </div>
         </div>
-      </div>
 
-      <div class="panel-box">
-        <h3>Change Account Password</h3>
-        <p>For security, you must verify your <strong>current password</strong> before setting a new password.</p>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <input type="password" id="curPassInput" placeholder="Current password..." style="width:200px;" />
-          <input type="password" id="newPassInput" placeholder="New password (min 6 chars)..." minlength="6" style="width:220px;" />
-          <input type="password" id="confPassInput" placeholder="Confirm new password..." minlength="6" style="width:200px;" />
-          <button class="btn-primary" onclick="updateMyPassword()">Update Password</button>
+        <div class="group-caption">Security</div>
+        <div class="list-group" style="margin-bottom:28px;">
+          <div class="list-row">
+            <div class="list-row-label">
+              <span class="row-title">Change Password</span>
+              <span class="row-sub">Verify your current password to set a new one</span>
+            </div>
+            <div class="list-row-control row-inline">
+              <input type="password" id="curPassInput" class="apple-input" placeholder="Current" style="width:135px;" />
+              <input type="password" id="newPassInput" class="apple-input" placeholder="New (6+)" minlength="6" style="width:135px;" />
+              <input type="password" id="confPassInput" class="apple-input" placeholder="Confirm" minlength="6" style="width:135px;" />
+              <button type="button" class="pill-btn primary" onclick="updateMyPassword()">Update</button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="panel-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div>
-            <h3>Database Backup &amp; Session</h3>
-            <p style="margin-bottom:0;">Export or import fleet JSON snapshots or sign out of your account.</p>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn-cyan" onclick="exportRegistry()">Export JSON</button>
-            <button class="role-admin" onclick="document.getElementById('importFile').click()">Import JSON</button>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importRegistry(event)" />
-            <button class="btn-danger" onclick="logoutUser()">Sign Out</button>
+        <div class="group-caption">Fleet Snapshot Backup</div>
+        <div class="list-group">
+          <div class="list-row compact">
+            <div class="list-row-label">
+              <span class="row-title">Registry JSON Export / Import</span>
+              <span class="row-sub">Download or restore fleet device snapshots</span>
+            </div>
+            <div class="list-row-control row-inline">
+              <button type="button" class="pill-btn" onclick="exportRegistry()">Export JSON</button>
+              <button type="button" class="pill-btn role-admin" onclick="document.getElementById('importFile').click()">Import JSON</button>
+              <input type="file" id="importFile" accept=".json" style="display:none" onchange="importRegistry(event)" />
+            </div>
           </div>
         </div>
+      </section>
+    </main>
+
+    <!-- Minimal Footer with Monochrome B&W Logo -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <img
+          src="../shared/assets/logo-maicxen-edge-bw.png"
+          alt="MAICXEN EDGE"
+          class="footer-logo"
+        />
+        <div class="footer-text">
+          <span>© 2026 MAICXEN EDGE</span>
+          <span class="sep">·</span>
+          <span>iot.maicxen.it</span>
+          <span class="sep">·</span>
+          <span>Fleet Console v3.2.0</span>
+        </div>
       </div>
-    </section>
+    </footer>
   </div>
 
-  <!-- POP-UP MODAL: UNIVERSAL DEVICE INSPECTOR, TELEMETRY & LIFECYCLE -->
+  <!-- ====================================================================== -->
+  <!-- APPLE-STYLE DEVICE INSPECTOR MODAL                                     -->
+  <!-- ====================================================================== -->
   <div class="modal-backdrop" id="deviceModal" onclick="if(event.target===this)closeDeviceModal()">
     <div class="modal-window">
       <div class="modal-header">
         <div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <h2 id="mTitle" style="font-size:18px; font-weight:800;">Device</h2>
-            <button class="role-editor" onclick="renameCurrentDevice()" style="padding:3px 8px; font-size:11px;">Rename</button>
+          <div class="row-inline" style="gap:10px;">
+            <h2 id="mTitle" class="modal-title">Device</h2>
+            <span class="pill green" id="mOnlinePill">ONLINE</span>
+            <button type="button" class="text-btn role-editor" onclick="renameCurrentDevice()">Rename</button>
           </div>
-          <div id="mSubtitle" style="font-size:12px; color:var(--muted-dash); margin-top:3px;">ID: --</div>
+          <div id="mSubtitle" class="modal-sub">ID: --</div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="pill green" id="mOnlinePill">ONLINE</span>
-          <button onclick="closeDeviceModal()" style="padding:5px 10px;">Close &times;</button>
-        </div>
+        <button type="button" class="close-btn" onclick="closeDeviceModal()" aria-label="Close">&times;</button>
       </div>
 
-      <div id="mPcbPreview" style="background:#05080f;border:1px solid var(--border-dash);border-radius:12px;padding:12px;margin-bottom:14px;display:flex;justify-content:center;align-items:center;"></div>
+      <div id="mPcbPreview" class="modal-stage"></div>
 
       <div class="modal-tabs">
-        <button class="modal-tab active" onclick="switchModalTab('ctrl', this)">1. Overview &amp; Local UI</button>
-        <button class="modal-tab" onclick="switchModalTab('telem', this)">2. Telemetry &amp; History</button>
-        <button class="modal-tab" onclick="switchModalTab('sys', this)">3. Firmware &amp; System</button>
+        <button type="button" class="modal-tab active" onclick="switchModalTab('ctrl', this)">Overview</button>
+        <button type="button" class="modal-tab" onclick="switchModalTab('telem', this)">Telemetry</button>
+        <button type="button" class="modal-tab" onclick="switchModalTab('sys', this)">System</button>
       </div>
 
       <!-- MODAL TAB 1 -->
       <div class="modal-pane active" id="mpane-ctrl">
-        <div class="detail-grid" id="mOverviewGrid" style="margin-bottom:14px;"></div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <a id="mLocalUiBtn" href="#" target="_blank" class="btn-primary" style="flex:1; min-width:220px; text-decoration:none; padding:12px 16px; border-radius:9px; font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
-            Open Product Local Web UI &nearr;
+        <div class="list-group modal-kv-list" id="mOverviewGrid"></div>
+        <div class="modal-actions">
+          <a id="mLocalUiBtn" href="#" target="_blank" rel="noopener" class="primary-btn modal-cta">
+            Open Local Web UI ↗
           </a>
-        </div>
-        <div style="font-size:11.5px; color:var(--muted-dash); margin-top:10px; line-height:1.45;">
-          Device controls (power, dimming, channels, effects, and FOTA triggers) operate directly with zero latency on the embedded Local Web UI, Amazon Alexa, or Matter.
+          <a id="mFlashUsbBtn" href="../" class="pill-btn modal-sec-cta">
+            Flash via USB ↗
+          </a>
         </div>
       </div>
 
       <!-- MODAL TAB 2 -->
       <div class="modal-pane" id="mpane-telem">
-        <div class="detail-grid" id="mTelemGrid"></div>
+        <div class="list-group modal-kv-list" id="mTelemGrid"></div>
       </div>
 
       <!-- MODAL TAB 3 -->
       <div class="modal-pane" id="mpane-sys">
-        <div class="detail-grid" id="mSysGrid" style="margin-bottom:16px;"></div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:12px; border-top:1px solid var(--border-dash);">
-          <button class="btn-danger role-admin" style="margin-left:auto;" onclick="removeCurrentDevice()">Remove Device (Admin)</button>
+        <div class="list-group modal-kv-list" id="mSysGrid"></div>
+        <div class="modal-danger-bar">
+          <button type="button" class="pill-btn danger role-admin" onclick="removeCurrentDevice()">Remove Device (Admin)</button>
         </div>
       </div>
     </div>

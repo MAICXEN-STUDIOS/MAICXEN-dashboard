@@ -514,7 +514,7 @@
         <div>
           <div class="brand-title" style="display:flex;align-items:center;gap:8px;">
             MAICXEN EDGE
-            <span class="mode-pill" style="font-size:10px;padding:2px 8px;">Flasher v2.1.0</span>
+            <span class="mode-pill" style="font-size:10px;padding:2px 8px;">Flasher v2.2.0</span>
           </div>
           <div class="brand-sub">Universal IoT Web Flasher &amp; Diagnostics Hub</div>
         </div>
@@ -574,6 +574,11 @@
           </svg>
           Connect USB Port &amp; Flash Firmware
         </button>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11.5px;color:var(--muted);cursor:pointer;user-select:none;">
+          <input type="checkbox" id="forceFlashChk" style="accent-color:var(--accent);width:14px;height:14px;" />
+          Force upload even if device is already on the latest version
+        </label>
 
         <div class="progress-section" id="progressSection">
           <div class="progress-header">
@@ -651,12 +656,12 @@
     </div>
 
     <div class="footer">
-      © 2026 <strong>MAICXEN EDGE</strong> — Unified Hardware &amp; Cloud Ecosystem · <code>iot.maicxen.it</code> · <strong>Web Flasher v2.1.0</strong>
+      © 2026 <strong>MAICXEN EDGE</strong> — Unified Hardware &amp; Cloud Ecosystem · <code>iot.maicxen.it</code> · <strong>Web Flasher v2.2.0</strong>
     </div>
   </div>
 
   <script type="module">
-    const FLASHER_VERSION = "2.1.0";
+    const FLASHER_VERSION = "2.2.0";
     const SUPABASE_URL = "https://fuhuykcbapcdwtrwpccy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aHV5a2NiYXBjZHd0cndwY2N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5NTIyODgsImV4cCI6MjExMDUyODI4OH0.Oj9qHs5l3YSy5NAjwLpzKCQaJNJ75a4dMaJl7RNtbgE";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -666,7 +671,7 @@
       {
         product_id: "smarty",
         product_name: "Smarty",
-        latest_version: "1.6.0",
+        latest_version: "1.6.1",
         tagline: "23×5 Addressable RGB Matrix · Capacitive Touch · Hybrid USB/Cloud FOTA",
         accent: "#f59e0b",
         models: [
@@ -675,21 +680,21 @@
             model_name: "Smarty 23×5 RGB Matrix (ESP32-S3)",
             chip: "ESP32-S3",
             hw_rev: "1.0",
-            latest_version: "1.6.0",
+            latest_version: "1.6.1",
             version_url: "./firmware/smarty/esp32s3-std/version.json",
             firmware_url: "./firmware/smarty/esp32s3-std/firmware.bin",
             bootloader_url: "./firmware/smarty/esp32s3-std/bootloader.bin",
             partitions_url: "./firmware/smarty/esp32s3-std/partitions.bin",
             boot_app0_url: "./firmware/smarty/esp32s3-std/boot_app0.bin",
             capabilities: ["power", "brightness", "rgb", "effects", "usb_fota", "cloud_fota", "local_web", "alexa"],
-            notes: "v1.6.0 — Minor release: streamlined direct Supabase telemetry, zero-latency local control architecture & USB-FOTA 921600 bps."
+            notes: "v1.6.1 — Enabled native ESP32-S3 USB-CDC (HWCDC) alongside UART0 for zero-reset Live USB Telemetry and WebSerial FOTA."
           }
         ]
       },
       {
         product_id: "aleda",
         product_name: "AledA",
-        latest_version: "1.1.0",
+        latest_version: "1.1.1",
         tagline: "Architectural 4-Relay, 4-Dimmer & 3-Strip Controller · Local Web UI · Matter / Voice Sync",
         accent: "#38bdf8",
         models: [
@@ -698,28 +703,28 @@
             model_name: "AledA Standard Controller (ESP32-S3)",
             chip: "ESP32-S3",
             hw_rev: "1.0",
-            latest_version: "1.1.0",
+            latest_version: "1.1.1",
             version_url: "./firmware/aleda/esp32s3-std/version.json",
             firmware_url: "./firmware/aleda/esp32s3-std/firmware.bin",
             bootloader_url: "./firmware/aleda/esp32s3-std/bootloader.bin",
             partitions_url: "./firmware/aleda/esp32s3-std/partitions.bin",
             boot_app0_url: "./firmware/aleda/esp32s3-std/boot_app0.bin",
             capabilities: ["power", "relays", "dimmers", "strips", "usb_fota", "cloud_fota", "local_web", "alexa"],
-            notes: "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
+            notes: "v1.1.1 — Added 8KB USB-CDC RX queue, 20ms TX timeout & non-blocking serial parser for Live USB Telemetry and zero-reset WebSerial FOTA."
           },
           {
             model_id: "esp32s3-matter",
             model_name: "AledA Matter over Wi-Fi Controller (ESP32-S3)",
             chip: "ESP32-S3",
             hw_rev: "1.0",
-            latest_version: "1.1.0",
+            latest_version: "1.1.1",
             version_url: "./firmware/aleda/esp32s3-matter/version.json",
             firmware_url: "./firmware/aleda/esp32s3-matter/firmware.bin",
             bootloader_url: "./firmware/aleda/esp32s3-matter/bootloader.bin",
             partitions_url: "./firmware/aleda/esp32s3-matter/partitions.bin",
             boot_app0_url: "./firmware/aleda/esp32s3-matter/boot_app0.bin",
             capabilities: ["power", "relays", "dimmers", "strips", "matter", "usb_fota", "cloud_fota", "local_web"],
-            notes: "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
+            notes: "v1.1.1 — Added 8KB USB-CDC RX queue, 20ms TX timeout & non-blocking serial parser for Live USB Telemetry and zero-reset WebSerial FOTA."
           }
         ]
       }
@@ -1091,12 +1096,53 @@
       return crc & 0xFFFF;
     }
 
+    function compareVersions(verA, verB) {
+      const parse = s => String(s || "0.0.0").replace(/^v/i, "").split(".").map(n => parseInt(n, 10) || 0);
+      const [a0 = 0, a1 = 0, a2 = 0] = parse(verA);
+      const [b0 = 0, b1 = 0, b2 = 0] = parse(verB);
+      if (a0 !== b0) return a0 > b0 ? 1 : -1;
+      if (a1 !== b1) return a1 > b1 ? 1 : -1;
+      if (a2 !== b2) return a2 > b2 ? 1 : -1;
+      return 0;
+    }
+
     function isVersionAtLeast(verStr, minMajor, minMinor, minPatch) {
-      if (!verStr) return false;
-      const [maj = 0, min = 0, pat = 0] = String(verStr).split(".").map(n => parseInt(n, 10) || 0);
-      if (maj !== minMajor) return maj > minMajor;
-      if (min !== minMinor) return min > minMinor;
-      return pat >= minPatch;
+      return compareVersions(verStr, `${minMajor}.${minMinor}.${minPatch}`) >= 0;
+    }
+
+    const USB_FOTA_MIN_VERSION = {
+      smarty: [1, 5, 0],
+      aleda: [1, 0, 0]
+    };
+
+    function isNativeEspUsb(port) {
+      try {
+        const info = port && port.getInfo ? port.getInfo() : {};
+        return info.usbVendorId === 0x303A;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    async function applySafeSerialSignals(port) {
+      try {
+        if (isNativeEspUsb(port)) {
+          // DTR=1 activates HWCDC/USBCDC TX on ESP32-S3 while RTS=0 prevents chip reset
+          await port.setSignals({ dataTerminalReady: true, requestToSend: false });
+        } else {
+          // On CP2102/CH340/FTDI auto-reset circuits, both low keeps EN=1 and IO0=1
+          await port.setSignals({ dataTerminalReady: false, requestToSend: false });
+        }
+      } catch (_) {}
+    }
+
+    async function safeClosePort(port) {
+      if (!port) return;
+      try {
+        if (port.readable && port.readable.locked) return;
+        await port.close();
+      } catch (_) {}
+      await new Promise(r => setTimeout(r, 80));
     }
 
     const espLoaderTerminal = {
@@ -1108,37 +1154,46 @@
       }
     };
 
-    // Probe connected MAICXEN EDGE device over USB (supports both 9600 baud Smarty and 115200 baud AledA)
-    let detectedRuntimeBaud = 9600;
-    async function probeDeviceVersion(port) {
-      const bauds = (selectedProduct && selectedProduct.product_id === "aleda") ? [115200, 9600] : [9600, 115200];
+    // Open & probe connected MAICXEN EDGE device ONCE, keeping the port open if telemetry responds!
+    let detectedRuntimeBaud = 115200;
+    async function openAndProbeOnSamePort(port) {
+      const nativeUsb = isNativeEspUsb(port);
+      const bauds = nativeUsb
+        ? [115200]
+        : ((selectedProduct && selectedProduct.product_id === "aleda") ? [115200, 9600] : [9600, 115200]);
+
       for (const baud of bauds) {
         let reader = null;
         try {
-          await port.open({ baudRate: baud });
-          try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
-          await new Promise(r => setTimeout(r, 120));
+          await port.open({ baudRate: baud, bufferSize: 16384 });
+          await applySafeSerialSignals(port);
+          await new Promise(r => setTimeout(r, 140));
 
-          const writer = port.writable.getWriter();
-          await writer.write(new TextEncoder().encode("\ntelemetry\n"));
-          writer.releaseLock();
+          const sendProbe = async () => {
+            if (!port.writable) return;
+            const w = port.writable.getWriter();
+            await w.write(new TextEncoder().encode("\ntelemetry\n"));
+            w.releaseLock();
+          };
 
+          await sendProbe();
           reader = port.readable.getReader();
           const decoder = new TextDecoder();
           let buf = "";
-          let retried = false;
+          let retriesSent = 0;
           const startMs = Date.now();
-          const deadline = startMs + 1100;
+          const deadline = startMs + 2400;
 
           while (Date.now() < deadline) {
-            if (!retried && Date.now() - startMs > 450 && port.writable) {
-              retried = true;
-              try {
-                const w2 = port.writable.getWriter();
-                await w2.write(new TextEncoder().encode("\ntelemetry\n"));
-                w2.releaseLock();
-              } catch (_) {}
+            const elapsed = Date.now() - startMs;
+            if (retriesSent === 0 && elapsed > 600) {
+              retriesSent = 1;
+              await sendProbe().catch(() => {});
+            } else if (retriesSent === 1 && elapsed > 1400) {
+              retriesSent = 2;
+              await sendProbe().catch(() => {});
             }
+
             const res = await Promise.race([
               reader.read(),
               new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 180))
@@ -1155,46 +1210,58 @@
                   const prefix = line.startsWith("SMARTY_TELEMETRY:") ? "SMARTY_TELEMETRY:" : "MAICXEN_TELEMETRY:";
                   const json = JSON.parse(line.slice(prefix.length));
                   detectedRuntimeBaud = baud;
-                  await reader.cancel();
-                  reader.releaseLock();
+                  try { await reader.cancel(); } catch (_) {}
+                  try { reader.releaseLock(); } catch (_) {}
                   reader = null;
-                  await port.close();
-                  await new Promise(r => setTimeout(r, 80));
-                  return json;
+                  return { devInfo: json, baud, nativeUsb, isOpen: true };
                 }
               }
             }
           }
-        } catch (_) {}
+        } catch (err) {
+          logLine(`[Probe] Notice @ ${baud} bps: ${err.message || err}`);
+        }
 
         if (reader) {
-          try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
+          try { await reader.cancel(); } catch (_) {}
+          try { reader.releaseLock(); } catch (_) {}
+          reader = null;
         }
-        try { await port.close(); } catch (_) {}
-        await new Promise(r => setTimeout(r, 80));
+        await safeClosePort(port);
       }
-      return null;
+      return { devInfo: null, baud: bauds[0], nativeUsb, isOpen: false };
     }
 
-    function autoMatchProductFromTelemetry(devInfo) {
+    function autoMatchProductFromTelemetry(devInfo, preserveModelSelection = false) {
       if (!devInfo) return;
       const hwStr = String(devInfo.hw_id || "").toUpperCase();
       const detectedProd = (devInfo.product_id || (hwStr.startsWith("ALEDA") || hwStr.startsWith("AL-") ? "aleda" : "smarty")).toLowerCase();
-      const detectedModel = devInfo.model_id || null;
+      let targetModel = devInfo.model_id || null;
+      if (preserveModelSelection && selectedProduct && selectedProduct.product_id === detectedProd && selectedModel) {
+        targetModel = selectedModel.model_id;
+      }
       if (catalogProducts.some(p => p.product_id === detectedProd)) {
-        selectProduct(detectedProd, detectedModel);
+        selectProduct(detectedProd, targetModel);
         document.getElementById("autoDetectBadge").textContent = `Auto-Detected: ${detectedProd.toUpperCase()} (${devInfo.hw_id || "USB"})`;
       }
     }
 
-    // Native High-Speed 921600-baud USB-FOTA
-    async function runNativeUsbFota(port, fwBytes, targetVer) {
-      const otaBaud = 921600;
+    // Native High-Speed Zero-Reset USB-FOTA (keeps device in OTA mode just like Wi-Fi FOTA)
+    async function runNativeUsbFota(port, fwBytes, targetVer, probeCtx = null) {
+      const nativeUsb = probeCtx ? probeCtx.nativeUsb : isNativeEspUsb(port);
+      const runtimeBaud = probeCtx ? probeCtx.baud : (detectedRuntimeBaud || 9600);
+      // On Native ESP32-S3 USB (0x303A), keep current port open without baud switch reset; USB always runs at 12 Mbps!
+      const otaBaud = nativeUsb ? runtimeBaud : 921600;
       let reader = null;
+      let wroteAnyChunk = false;
       try {
-        await port.open({ baudRate: detectedRuntimeBaud || 9600 });
-        try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
+        if (!probeCtx || !probeCtx.isOpen) {
+          await port.open({ baudRate: runtimeBaud, bufferSize: 16384 });
+          await applySafeSerialSignals(port);
+          await new Promise(r => setTimeout(r, 120));
+        }
 
+        updateProgress("Entering USB-FOTA Update Mode (No Bootloader Reset)...", 8);
         let writer = port.writable.getWriter();
         const startCmd = JSON.stringify({ cmd: "serial_ota_start", size: fwBytes.length, baud: otaBaud }) + "\n";
         await writer.write(new TextEncoder().encode(startCmd));
@@ -1204,12 +1271,12 @@
         const decoder = new TextDecoder();
         let buf = "";
         let switchConfirmed = false;
-        const switchDeadline = Date.now() + 2000;
+        const switchDeadline = Date.now() + 2500;
 
         while (Date.now() < switchDeadline && !switchConfirmed) {
           const r = await Promise.race([
             reader.read(),
-            new Promise(res => setTimeout(() => res({ timeout: true }), 250))
+            new Promise(res => setTimeout(() => res({ timeout: true }), 200))
           ]);
           if (r.timeout) continue;
           if (r.done) break;
@@ -1222,23 +1289,33 @@
           }
         }
 
-        await reader.cancel();
-        reader.releaseLock();
-        reader = null;
-        await port.close();
+        if (!switchConfirmed) {
+          try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
+          reader = null;
+          throw new Error("USB-FOTA handshake not received from firmware");
+        }
 
-        if (!switchConfirmed) throw new Error("USB-FOTA baudrate switch handshake not received");
-        await new Promise(r => setTimeout(r, 120));
-
-        await port.open({ baudRate: otaBaud, bufferSize: 16384 });
-        try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
+        if (!nativeUsb && otaBaud !== runtimeBaud) {
+          // UART bridge baud switch to 921600 bps
+          try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
+          reader = null;
+          await safeClosePort(port);
+          await new Promise(r => setTimeout(r, 100));
+          await port.open({ baudRate: otaBaud, bufferSize: 16384 });
+          await applySafeSerialSignals(port);
+          await new Promise(r => setTimeout(r, 80));
+          reader = port.readable.getReader();
+          buf = "";
+        } else {
+          // Consume trailing switch line before OTA_SYNC
+          const nlIdx = buf.lastIndexOf("\n");
+          if (nlIdx >= 0) buf = buf.slice(nlIdx + 1);
+          await new Promise(r => setTimeout(r, 90));
+        }
 
         writer = port.writable.getWriter();
         await writer.write(new TextEncoder().encode("OTA_SYNC\n"));
         writer.releaseLock();
-
-        reader = port.readable.getReader();
-        buf = "";
 
         const readLineWithTimeout = async (ms) => {
           const end = Date.now() + ms;
@@ -1251,7 +1328,7 @@
             }
             const r = await Promise.race([
               reader.read(),
-              new Promise(res => setTimeout(() => res({ timeout: true }), 200))
+              new Promise(res => setTimeout(() => res({ timeout: true }), 180))
             ]);
             if (r.timeout) continue;
             if (r.done) return null;
@@ -1261,9 +1338,19 @@
         };
 
         let ready = false;
-        const readyDeadline = Date.now() + 2500;
+        const readyDeadline = Date.now() + 3000;
+        let syncRetried = false;
+        const readyStart = Date.now();
         while (Date.now() < readyDeadline) {
-          const line = await readLineWithTimeout(400);
+          if (!syncRetried && Date.now() - readyStart > 1000) {
+            syncRetried = true;
+            try {
+              const w2 = port.writable.getWriter();
+              await w2.write(new TextEncoder().encode("OTA_SYNC\n"));
+              w2.releaseLock();
+            } catch (_) {}
+          }
+          const line = await readLineWithTimeout(350);
           if (!line) continue;
           logLine(`[USB-FOTA] ${line}`);
           if (line.includes("SMARTY_OTA_READY") || line.includes("MAICXEN_OTA_READY")) {
@@ -1275,7 +1362,7 @@
 
         if (!ready) throw new Error("Timeout waiting for OTA_READY");
 
-        logLine(`[USB-FOTA] Streaming firmware v${targetVer} at 921600 bps with CRC-16 verification...`);
+        logLine(`[USB-FOTA] Streaming firmware v${targetVer} (${nativeUsb ? "Native USB 12Mbps" : otaBaud + " bps"}) with CRC-16 verification...`);
         updateProgress(`Streaming USB-FOTA v${targetVer}...`, 12);
 
         const chunkSize = 2048;
@@ -1305,6 +1392,7 @@
           if (!respLine) throw new Error(`ACK timeout at byte ${offset}`);
 
           if (respLine.startsWith("ACK:")) {
+            wroteAnyChunk = true;
             offset = end;
             retries = 0;
             const devPct = parseInt(respLine.slice(4), 10) || Math.round((offset * 100) / fwBytes.length);
@@ -1322,21 +1410,20 @@
         const finalLine = await readLineWithTimeout(3000);
         if (finalLine) logLine(`[USB-FOTA] ${finalLine}`);
 
-        await reader.cancel();
-        reader.releaseLock();
+        try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
         reader = null;
-        await port.close();
+        await safeClosePort(port);
 
-        updateProgress("USB-FOTA Complete! Rebooting device...", 100);
-        setStatus("success", `${selectedProduct.product_name} (${selectedModel.model_name}) updated to v${targetVer} via native High-Speed USB-FOTA!`);
-        return true;
+        updateProgress("USB-FOTA Complete! Applying & Rebooting...", 100);
+        setStatus("success", `${selectedProduct.product_name} (${selectedModel.model_name}) updated to v${targetVer} via seamless USB-FOTA (no bootloader reset)!`);
+        return { ok: true, wroteAnyChunk };
       } catch (err) {
         logLine(`[USB-FOTA] Notice: ${err.message || err}`);
         if (reader) {
           try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
         }
-        try { await port.close(); } catch (_) {}
-        return false;
+        await safeClosePort(port);
+        return { ok: false, wroteAnyChunk, error: err };
       }
     }
 
@@ -1422,22 +1509,27 @@
       }
     }
 
-    // --- LIVE USB DIAGNOSTICS ---
+    // --- LIVE USB DIAGNOSTICS & FLASH CONTROLLER ---
     let diagPort = null;
     let diagReader = null;
     let diagTimer = null;
+    let diagClosing = false;
 
     async function closeUsbDiagnostics() {
+      diagClosing = true;
       if (diagTimer) { clearInterval(diagTimer); diagTimer = null; }
       if (diagReader) {
         try { await diagReader.cancel(); } catch (_) {}
+        try { diagReader.releaseLock(); } catch (_) {}
         diagReader = null;
       }
       if (diagPort) {
         try { await diagPort.close(); } catch (_) {}
         diagPort = null;
       }
+      await new Promise(r => setTimeout(r, 80));
       document.getElementById("usbDiagBtn").textContent = "Connect USB Telemetry";
+      diagClosing = false;
     }
 
     flashBtn.addEventListener("click", async () => {
@@ -1452,36 +1544,63 @@
         flashBtn.disabled = true;
         espLoaderTerminal.clean();
         updateProgress("Probing connected MAICXEN EDGE device...", 2);
-        logLine("[MAICXEN EDGE] Probing device telemetry (9600 / 115200 baud)...");
+        logLine("[MAICXEN EDGE] Probing device telemetry over USB...");
 
-        const devInfo = await probeDeviceVersion(port);
+        const probe = await openAndProbeOnSamePort(port);
+        const devInfo = probe.devInfo;
+        const forceFlash = Boolean(document.getElementById("forceFlashChk")?.checked);
+
         if (devInfo) {
-          autoMatchProductFromTelemetry(devInfo);
-          logLine(`[MAICXEN EDGE] Detected ${devInfo.hw_id} running v${devInfo.fw} (${devInfo.ota_part}).`);
+          autoMatchProductFromTelemetry(devInfo, true);
+          logLine(`[MAICXEN EDGE] Detected ${devInfo.hw_id} (${devInfo.product_id || "device"}) running v${devInfo.fw} (${devInfo.ota_part}).`);
+
+          const targetVer = selectedModel.latest_version || selectedProduct.latest_version;
+          const verCmp = compareVersions(devInfo.fw, targetVer);
+          if (verCmp >= 0 && !forceFlash) {
+            await safeClosePort(port);
+            updateProgress("Already Up to Date (Upload Skipped)", 100);
+            logLine(`[MAICXEN EDGE] Version check: installed v${devInfo.fw} >= target v${targetVer}. Upload skipped.`);
+            setStatus(
+              "success",
+              `${selectedProduct.product_name} (${devInfo.hw_id}) is already up to date on v${devInfo.fw} (target release: v${targetVer}). Upload skipped.`
+            );
+            return;
+          }
+          logLine(`[MAICXEN EDGE] Update eligible: v${devInfo.fw} -> v${targetVer}`);
         } else {
-          logLine("[MAICXEN EDGE] No active runtime telemetry detected (legacy or blank flash).");
+          logLine("[MAICXEN EDGE] No runtime telemetry detected (blank flash or legacy firmware).");
         }
 
-        const supportsSerialOta = devInfo && (devInfo.serial_ota === true || isVersionAtLeast(devInfo.fw, 1, 5, 0));
+        const prodSlug = String((devInfo && devInfo.product_id) || selectedProduct.product_id || "").toLowerCase();
+        const minThr = USB_FOTA_MIN_VERSION[prodSlug] || [1, 0, 0];
+        const meetsThreshold = devInfo && (devInfo.serial_ota === true || isVersionAtLeast(devInfo.fw, minThr[0], minThr[1], minThr[2]));
         const baseDir = `./firmware/${selectedProduct.product_id}/${selectedModel.model_id}`;
         const fwUrl = selectedModel.firmware_url || `${baseDir}/firmware.bin`;
 
-        if (supportsSerialOta) {
-          modeBadgeEl.textContent = `Mode: Native USB-FOTA (v${devInfo.fw} -> v${selectedModel.latest_version})`;
+        if (meetsThreshold) {
+          modeBadgeEl.textContent = `Mode: Seamless USB-FOTA (v${devInfo.fw} -> v${selectedModel.latest_version})`;
           updateProgress("Downloading firmware binary for USB-FOTA...", 6);
           const fwRes = await fetch(`${fwUrl}?cb=${Date.now()}`, { cache: "no-store" });
           if (!fwRes.ok) throw new Error(`Failed to fetch ${fwUrl} (HTTP ${fwRes.status})`);
           const fwBytes = new Uint8Array(await fwRes.arrayBuffer());
 
-          const fotaOk = await runNativeUsbFota(port, fwBytes, selectedModel.latest_version);
-          if (!fotaOk) {
-            logLine("[MAICXEN EDGE] Falling back to esptool-js Bootloader mode...");
+          const fotaRes = await runNativeUsbFota(port, fwBytes, selectedModel.latest_version, probe);
+          if (!fotaRes.ok) {
+            if (fotaRes.wroteAnyChunk) {
+              throw fotaRes.error || new Error("USB-FOTA transfer interrupted");
+            }
+            logLine("[MAICXEN EDGE] Native USB-FOTA unavailable — falling back to esptool-js Bootloader mode...");
             await runClassicEsptoolFlash(port);
           }
         } else {
+          await safeClosePort(port);
+          logLine(devInfo
+            ? `[MAICXEN EDGE] Installed v${devInfo.fw} < USB-FOTA threshold v${minThr.join(".")} -> using direct esptool-js upload.`
+            : "[MAICXEN EDGE] Entering direct esptool-js Bootloader upload...");
           await runClassicEsptoolFlash(port);
         }
       } catch (err) {
+        if (port) await safeClosePort(port);
         consoleDetails.open = true;
         renderIdleBitmap(true);
         logLine(`ERROR: ${err.message || err}`);
@@ -1501,7 +1620,7 @@
       autoMatchProductFromTelemetry(t);
       document.getElementById("tHwId").textContent = `${t.hw_id || "ESP32"} (${t.product_id || t.profile || "MAICXEN"})`;
       document.getElementById("tFwPart").textContent = `v${t.fw || "?"} (${t.ota_part || "app0"})`;
-      document.getElementById("tModeState").textContent = `${t.power ? "ON" : "OFF"} · ${t.mode || "Solid"} (${t.brightness ?? 100}%)`;
+      document.getElementById("tModeState").textContent = `${t.power ? "ON" : "OFF"} · ${t.mode || `${t.active_channels ?? 0} ch`} (${t.brightness ?? 100}%)`;
       document.getElementById("tWifi").textContent = t.wifi_ssid ? `${t.wifi_ssid} (${t.rssi} dBm)` : "Disconnected";
       const ipEl = document.getElementById("tIpLink");
       if (t.wifi_ip && t.wifi_ip !== "0.0.0.0") {
@@ -1512,15 +1631,73 @@
       document.getElementById("tCloud").textContent = t.cloud_online ? "Connected (ONLINE)" : "Offline";
       document.getElementById("tTempHeap").textContent = `${Number(t.temp || 0).toFixed(1)}°C · ${Math.round((t.heap_free || 0) / 1024)} KB free`;
       document.getElementById("tUptime").textContent = `${fmtDur(t.uptime)} / Tot: ${fmtDur(t.total_on_sec)}`;
-      document.getElementById("matrixStatusRight").textContent = `${t.hw_id} · ${t.mode || ""} (${t.hex || ""})`;
-      renderIdleBitmap(false, t.power ? (t.hex || "#f59e0b") : "#1e293b");
+      document.getElementById("matrixStatusRight").textContent = `${t.hw_id} · ${t.mode || ""} ${t.hex ? `(${t.hex})` : ""}`;
+      renderIdleBitmap(false, t.power ? (t.hex || (selectedProduct && selectedProduct.accent) || "#f59e0b") : "#1e293b");
     }
 
     async function requestUsbTelemetry() {
       if (!diagPort || !diagPort.writable) return;
       const writer = diagPort.writable.getWriter();
-      await writer.write(new TextEncoder().encode("telemetry\n"));
+      await writer.write(new TextEncoder().encode("\ntelemetry\n"));
       writer.releaseLock();
+    }
+
+    async function streamDiagPortLoop(port, baudRate, tryAlternateOnTimeout) {
+      await port.open({ baudRate, bufferSize: 16384 });
+      await applySafeSerialSignals(port);
+      await new Promise(r => setTimeout(r, 150));
+
+      document.getElementById("usbDiagBtn").textContent = "Disconnect USB";
+      document.getElementById("matrixStatusRight").textContent = `USB Connected @ ${baudRate} bps · Waiting telemetry...`;
+      logLine(`[USB] Live Telemetry connected (${baudRate} bps${isNativeEspUsb(port) ? ", Native USB-CDC" : ""})`);
+
+      await requestUsbTelemetry();
+      setTimeout(() => { if (diagPort === port && !gotPacket) requestUsbTelemetry().catch(() => {}); }, 800);
+      setTimeout(() => { if (diagPort === port && !gotPacket) requestUsbTelemetry().catch(() => {}); }, 1600);
+
+      diagTimer = setInterval(() => {
+        if (diagPort === port) requestUsbTelemetry().catch(() => {});
+      }, 2500);
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+      var gotPacket = false;
+      const startTime = Date.now();
+      diagReader = port.readable.getReader();
+
+      while (diagPort === port) {
+        const res = await Promise.race([
+          diagReader.read(),
+          new Promise(r => setTimeout(() => r({ timeout: true }), 400))
+        ]);
+        if (diagPort !== port || diagClosing) break;
+        if (res.timeout) {
+          if (tryAlternateOnTimeout && !gotPacket && (Date.now() - startTime) > 2600) {
+            return { switchBaud: true };
+          }
+          continue;
+        }
+        if (res.done) break;
+        if (res.value) {
+          buffer += decoder.decode(res.value, { stream: true });
+          let nl;
+          while ((nl = buffer.indexOf("\n")) >= 0) {
+            const line = buffer.slice(0, nl).trim();
+            buffer = buffer.slice(nl + 1);
+            if (line.startsWith("SMARTY_TELEMETRY:") || line.startsWith("MAICXEN_TELEMETRY:")) {
+              try {
+                const prefix = line.startsWith("SMARTY_TELEMETRY:") ? "SMARTY_TELEMETRY:" : "MAICXEN_TELEMETRY:";
+                gotPacket = true;
+                detectedRuntimeBaud = baudRate;
+                updateTelemetryUI(JSON.parse(line.slice(prefix.length)));
+              } catch (_) {}
+            } else if (line) {
+              logLine(`[USB] ${line}`);
+            }
+          }
+        }
+      }
+      return { switchBaud: false };
     }
 
     document.getElementById("usbDiagBtn").addEventListener("click", async () => {
@@ -1530,45 +1707,30 @@
       }
       try {
         diagPort = await navigator.serial.requestPort();
-        document.getElementById("usbDiagBtn").textContent = "Probing USB...";
-        const initialInfo = await probeDeviceVersion(diagPort);
-        if (initialInfo) {
-          updateTelemetryUI(initialInfo);
-        }
-        await diagPort.open({ baudRate: detectedRuntimeBaud || 9600 });
-        try { await diagPort.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
-        await new Promise(r => setTimeout(r, 80));
-        document.getElementById("usbDiagBtn").textContent = "Disconnect USB";
+        const activePort = diagPort;
+        const nativeUsb = isNativeEspUsb(activePort);
+        const primaryBaud = nativeUsb
+          ? 115200
+          : ((selectedProduct && selectedProduct.product_id === "aleda") ? 115200 : 9600);
+        const altBaud = primaryBaud === 115200 ? 9600 : 115200;
 
-        await requestUsbTelemetry();
-        diagTimer = setInterval(() => {
-          if (diagPort) requestUsbTelemetry().catch(() => {});
-        }, 2500);
-
-        const decoder = new TextDecoder();
-        let buffer = "";
-        diagReader = diagPort.readable.getReader();
-        while (true) {
-          const { value, done } = await diagReader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          let nl;
-          while ((nl = buffer.indexOf("\n")) >= 0) {
-            const line = buffer.slice(0, nl).trim();
-            buffer = buffer.slice(nl + 1);
-            if (line.startsWith("SMARTY_TELEMETRY:") || line.startsWith("MAICXEN_TELEMETRY:")) {
-              try {
-                const prefix = line.startsWith("SMARTY_TELEMETRY:") ? "SMARTY_TELEMETRY:" : "MAICXEN_TELEMETRY:";
-                updateTelemetryUI(JSON.parse(line.slice(prefix.length)));
-              } catch (_) {}
-            } else if (line) {
-              logLine(`[USB] ${line}`);
-            }
+        document.getElementById("usbDiagBtn").textContent = "Connecting USB...";
+        const res = await streamDiagPortLoop(activePort, primaryBaud, !nativeUsb);
+        if (res && res.switchBaud && diagPort === activePort && !diagClosing) {
+          if (diagTimer) { clearInterval(diagTimer); diagTimer = null; }
+          if (diagReader) {
+            try { await diagReader.cancel(); diagReader.releaseLock(); } catch (_) {}
+            diagReader = null;
           }
+          await safeClosePort(activePort);
+          await streamDiagPortLoop(activePort, altBaud, false);
         }
       } catch (e) {
-        logLine(`USB Telemetry Error: ${e.message || e}`);
-        await closeUsbDiagnostics();
+        if (!diagClosing) {
+          logLine(`USB Telemetry Error: ${e.message || e}`);
+          setStatus("warning", `USB Telemetry notice: ${e.message || e}`);
+          await closeUsbDiagnostics();
+        }
       }
     });
   </script>

@@ -2,13 +2,14 @@
   "product_id": "aleda",
   "product_name": "AledA",
   "model_id": "esp32s3-matter",
-  "model_name": "AledA Matter over Wi-Fi Controller (ESP32-S3)",
+  "model_name": "AledA (esp32s3-matter)",
   "chip": "ESP32-S3",
   "hw_rev": "1.0",
   "version": "1.0.0",
   "url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/firmware.bin",
+  "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/firmware.bin",
   "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/bootloader.bin",
   "partitions_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/partitions.bin",
   "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/boot_app0.bin",
-  "notes": "v1.0.0 — Native Matter-over-WiFi 8MB Dual-OTA build for MAICXEN EDGE."
+  "notes": "v1.0.0 — MAICXEN EDGE Native USB-FOTA, Cloud FOTA & Supabase Fleet Sync."
 }

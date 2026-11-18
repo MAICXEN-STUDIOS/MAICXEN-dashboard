@@ -1,7 +1,7 @@
 export const ORG_NAME = "MAICXEN EDGE";
 export const DOMAIN_HOST = "iot.maicxen.it";
 
-export const FLASHER_VERSION = "2.2.0";
+export const FLASHER_VERSION = "2.3.0";
 export const DASHBOARD_VERSION = "3.1.0";
 
 export const SUPABASE_URL = "https://fuhuykcbapcdwtrwpccy.supabase.co";
@@ -14,5 +14,6 @@ export const SUPABASE_ANON_KEY =
  */
 export const USB_FOTA_MIN_VERSION = {
   smarty: [1, 5, 0],
-  aleda: [1, 0, 0]
+  aleda: [1, 0, 0],
+  onir: [1, 0, 0]
 };

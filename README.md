@@ -7,7 +7,7 @@
 [![Web Flasher](https://img.shields.io/badge/Web%20Flasher-v2.3.0%20(%20iot.maicxen.it%20)-f59e0b?style=for-the-badge&logo=googlechrome&logoColor=white)](https://iot.maicxen.it/)
 [![Fleet Console](https://img.shields.io/badge/Fleet%20Console-v3.1.0%20(%20%2Fdashboard%2F%20)-06b6d4?style=for-the-badge&logo=shield&logoColor=white)](https://iot.maicxen.it/dashboard/)
 [![Smarty Firmware](https://img.shields.io/badge/Smarty-v1.6.1-10b981?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=smarty)
-[![AledA Firmware](https://img.shields.io/badge/AledA-v1.1.2-38bdf8?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=aleda)
+[![AledA Firmware](https://img.shields.io/badge/AledA-v1.1.3-38bdf8?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=aleda)
 [![onIR Firmware](https://img.shields.io/badge/onIR-v1.0.1-a855f7?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=onir)
 [![Cloud Backend](https://img.shields.io/badge/Database-Supabase%20PostgreSQL%20%2B%20RLS-3ecf8e?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 

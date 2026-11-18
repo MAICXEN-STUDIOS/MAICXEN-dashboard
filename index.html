@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAICXEN EDGE — Universal IoT Web Flasher & USB Diagnostics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07090e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>MAICXEN EDGE — Universal IoT Web Flasher &amp; USB Diagnostics</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -418,6 +421,87 @@
       text-align: center;
       font-size: 11.5px;
       color: var(--muted);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ==========================================================================
+       MOBILE & TABLET RESPONSIVE OPTIMIZATIONS
+       ========================================================================== */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px 10px 24px;
+      }
+      select.model-select, input {
+        font-size: 16px !important;
+      }
+      .topbar {
+        padding: 12px 14px;
+        border-radius: 14px;
+        margin-bottom: 14px;
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+      }
+      .brand-title {
+        font-size: 15px;
+      }
+      .brand-sub {
+        font-size: 10px;
+      }
+      .topbar-actions {
+        width: 100%;
+      }
+      .nav-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 14px;
+        min-height: 42px;
+      }
+      .card {
+        padding: 16px 14px;
+        border-radius: 15px;
+      }
+      .product-tabs {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      .product-tab {
+        padding: 10px 11px;
+      }
+      .matrix-preview {
+        padding: 10px;
+        margin: 12px 0;
+      }
+      .matrix-grid {
+        gap: 2px;
+      }
+      .matrix-caption {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+      }
+      .flash-btn {
+        padding: 14px 16px;
+        font-size: 14px;
+        min-height: 48px;
+      }
+      .btn-sec {
+        min-height: 38px;
+      }
+      .telem-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .product-tabs {
+        grid-template-columns: 1fr;
+      }
+      .telem-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -801,11 +885,11 @@
       }
     }
 
+    loadCatalog();
     if (!("serial" in navigator)) {
-      setStatus("warning", "Your browser does not support WebSerial. Please open this page in Google Chrome, Microsoft Edge, or Opera on desktop.");
+      setStatus("warning", "Mobile / Non-WebSerial Browser Detected: You can browse the MAICXEN EDGE product catalog and open the Fleet Console above. For physical USB cable flashing, open this page on desktop Chrome, Edge, or Opera.");
       flashBtn.disabled = true;
-    } else {
-      loadCatalog();
+      document.getElementById("usbDiagBtn").disabled = true;
     }
 
     // --- CRC-16/CCITT-FALSE ---

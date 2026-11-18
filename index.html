@@ -512,7 +512,10 @@
       <div class="brand">
         <div class="brand-mark">M</div>
         <div>
-          <div class="brand-title">MAICXEN EDGE</div>
+          <div class="brand-title" style="display:flex;align-items:center;gap:8px;">
+            MAICXEN EDGE
+            <span class="mode-pill" style="font-size:10px;padding:2px 8px;">Flasher v2.1.0</span>
+          </div>
           <div class="brand-sub">Universal IoT Web Flasher &amp; Diagnostics Hub</div>
         </div>
       </div>
@@ -597,7 +600,7 @@
           <button type="button" class="btn-sec" id="usbDiagBtn">Connect USB Telemetry</button>
         </div>
         <p style="font-size:12px;color:var(--muted);line-height:1.45;margin-bottom:12px;">
-          Inspect live device parameters, auto-detect the installed product &amp; firmware version, or test power and lighting modes directly over USB without Wi-Fi.
+          Inspect live hardware parameters, auto-detect the installed product &amp; firmware version, and monitor network, thermal, memory, and OTA partition state directly over USB without Wi-Fi.
         </p>
 
         <div class="telem-grid">
@@ -635,16 +638,6 @@
           </div>
         </div>
 
-        <div id="usbQuickControls" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-          <div class="section-label"><span>Universal USB Test Controls</span></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({power:1})">Power ON</button>
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({power:0})">Power OFF</button>
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({action:'fota_check'})">Check FOTA</button>
-            <button type="button" class="btn-sec" onclick="window.sendUsbCmd({action:'reboot'})">Reboot</button>
-          </div>
-        </div>
-
         <div class="info-box" style="margin-top:16px;margin-bottom:0;">
           <div style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:6px;">
             ⚡ How Hybrid USB-FOTA Works
@@ -658,16 +651,81 @@
     </div>
 
     <div class="footer">
-      © 2026 <strong>MAICXEN EDGE</strong> — Unified Hardware &amp; Cloud Ecosystem · <code>iot.maicxen.it</code>
+      © 2026 <strong>MAICXEN EDGE</strong> — Unified Hardware &amp; Cloud Ecosystem · <code>iot.maicxen.it</code> · <strong>Web Flasher v2.1.0</strong>
     </div>
   </div>
 
   <script type="module">
-    import { ESPLoader, Transport } from "https://unpkg.com/esptool-js@0.4.5/bundle.js";
-
+    const FLASHER_VERSION = "2.1.0";
     const SUPABASE_URL = "https://fuhuykcbapcdwtrwpccy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aHV5a2NiYXBjZHd0cndwY2N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5NTIyODgsImV4cCI6MjExMDUyODI4OH0.Oj9qHs5l3YSy5NAjwLpzKCQaJNJ75a4dMaJl7RNtbgE";
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    // --- CATALOG & PRODUCT SELECTION STATE (DECLARED FIRST TO AVOID TDZ) ---
+    let catalogProducts = [
+      {
+        product_id: "smarty",
+        product_name: "Smarty",
+        latest_version: "1.6.0",
+        tagline: "23×5 Addressable RGB Matrix · Capacitive Touch · Hybrid USB/Cloud FOTA",
+        accent: "#f59e0b",
+        models: [
+          {
+            model_id: "esp32s3-std",
+            model_name: "Smarty 23×5 RGB Matrix (ESP32-S3)",
+            chip: "ESP32-S3",
+            hw_rev: "1.0",
+            latest_version: "1.6.0",
+            version_url: "./firmware/smarty/esp32s3-std/version.json",
+            firmware_url: "./firmware/smarty/esp32s3-std/firmware.bin",
+            bootloader_url: "./firmware/smarty/esp32s3-std/bootloader.bin",
+            partitions_url: "./firmware/smarty/esp32s3-std/partitions.bin",
+            boot_app0_url: "./firmware/smarty/esp32s3-std/boot_app0.bin",
+            capabilities: ["power", "brightness", "rgb", "effects", "usb_fota", "cloud_fota", "local_web", "alexa"],
+            notes: "v1.6.0 — Minor release: streamlined direct Supabase telemetry, zero-latency local control architecture & USB-FOTA 921600 bps."
+          }
+        ]
+      },
+      {
+        product_id: "aleda",
+        product_name: "AledA",
+        latest_version: "1.1.0",
+        tagline: "Architectural 4-Relay, 4-Dimmer & 3-Strip Controller · Local Web UI · Matter / Voice Sync",
+        accent: "#38bdf8",
+        models: [
+          {
+            model_id: "esp32s3-std",
+            model_name: "AledA Standard Controller (ESP32-S3)",
+            chip: "ESP32-S3",
+            hw_rev: "1.0",
+            latest_version: "1.1.0",
+            version_url: "./firmware/aleda/esp32s3-std/version.json",
+            firmware_url: "./firmware/aleda/esp32s3-std/firmware.bin",
+            bootloader_url: "./firmware/aleda/esp32s3-std/bootloader.bin",
+            partitions_url: "./firmware/aleda/esp32s3-std/partitions.bin",
+            boot_app0_url: "./firmware/aleda/esp32s3-std/boot_app0.bin",
+            capabilities: ["power", "relays", "dimmers", "strips", "usb_fota", "cloud_fota", "local_web", "alexa"],
+            notes: "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
+          },
+          {
+            model_id: "esp32s3-matter",
+            model_name: "AledA Matter over Wi-Fi Controller (ESP32-S3)",
+            chip: "ESP32-S3",
+            hw_rev: "1.0",
+            latest_version: "1.1.0",
+            version_url: "./firmware/aleda/esp32s3-matter/version.json",
+            firmware_url: "./firmware/aleda/esp32s3-matter/firmware.bin",
+            bootloader_url: "./firmware/aleda/esp32s3-matter/bootloader.bin",
+            partitions_url: "./firmware/aleda/esp32s3-matter/partitions.bin",
+            boot_app0_url: "./firmware/aleda/esp32s3-matter/boot_app0.bin",
+            capabilities: ["power", "relays", "dimmers", "strips", "matter", "usb_fota", "cloud_fota", "local_web"],
+            notes: "v1.1.0 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
+          }
+        ]
+      }
+    ];
+    let selectedProduct = catalogProducts[0];
+    let selectedModel = catalogProducts[0].models[0];
 
     // --- DYNAMIC STYLIZED PCB HARDWARE VISUALIZER (SMARTY, ALEDA V4 & GENERIC MAICXEN EDGE) ---
     const pcbVisEl = document.getElementById("pcbVisualizer");
@@ -839,11 +897,6 @@
 
     renderIdleBitmap();
 
-    // --- CATALOG & PRODUCT SELECTION STATE ---
-    let catalogProducts = [];
-    let selectedProduct = null;
-    let selectedModel = null;
-
     const productTabsEl = document.getElementById("productTabs");
     const modelSelectEl = document.getElementById("modelSelect");
     const selectedModelTitleEl = document.getElementById("selectedModelTitle");
@@ -891,11 +944,11 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "product-tab" + (selectedProduct && selectedProduct.product_id === prod.product_id ? " active" : "");
-        const chipLabel = prod.models?.[0]?.chip || "ESP32-S3";
+        const prodVer = prod.latest_version || prod.models?.[0]?.latest_version || "1.0.0";
         btn.innerHTML = `
           <div class="product-tab-top">
             <span class="product-tab-name">${prod.product_name}</span>
-            <span class="product-tab-chip">${chipLabel}</span>
+            <span class="product-tab-chip">v${prodVer}</span>
           </div>
           <div class="product-tab-desc">${prod.tagline || `${prod.models.length} hardware variant(s)`}</div>
         `;
@@ -907,13 +960,16 @@
     function selectProduct(productId, preferredModelId = null) {
       selectedProduct = catalogProducts.find(p => p.product_id === productId) || catalogProducts[0];
       if (!selectedProduct) return;
+      const unifiedVer = selectedProduct.latest_version || selectedProduct.models?.[0]?.latest_version || "1.0.0";
+      selectedProduct.latest_version = unifiedVer;
+      selectedProduct.models.forEach(m => { m.latest_version = unifiedVer; });
       renderProductTabs();
 
       modelSelectEl.innerHTML = "";
       selectedProduct.models.forEach(m => {
         const opt = document.createElement("option");
         opt.value = m.model_id;
-        opt.textContent = `${m.model_name} — v${m.latest_version} (${m.chip} · Rev ${m.hw_rev || "1.0"})`;
+        opt.textContent = `${m.model_name} — ${m.chip} · Rev ${m.hw_rev || "1.0"} (Firmware v${unifiedVer})`;
         modelSelectEl.appendChild(opt);
       });
 
@@ -930,10 +986,11 @@
       selectedModel = selectedProduct.models.find(m => m.model_id === modelId) || selectedProduct.models[0];
       if (!selectedModel) return;
 
-      selectedModelTitleEl.textContent = selectedModel.model_name;
-      fwVersionEl.textContent = `v${selectedModel.latest_version}`;
+      const unifiedVer = selectedProduct.latest_version || selectedModel.latest_version || "1.0.0";
+      selectedModelTitleEl.textContent = `${selectedProduct.product_name} — ${selectedModel.model_name}`;
+      fwVersionEl.textContent = `v${unifiedVer}`;
       fwNotesEl.textContent = selectedModel.notes || selectedModel.release_notes || "Ready for WebSerial deployment.";
-      document.getElementById("matrixLeftLabel").textContent = `${selectedProduct.product_name} · ${selectedModel.chip} Visualizer`;
+      document.getElementById("matrixLeftLabel").textContent = `${selectedProduct.product_name} (v${unifiedVer}) · ${selectedModel.chip} Hardware Render`;
       renderIdleBitmap(false, selectedProduct.accent || "#f59e0b");
 
       capTagsEl.innerHTML = "";
@@ -947,9 +1004,13 @@
 
     modelSelectEl.addEventListener("change", () => selectModel(modelSelectEl.value));
 
+    // Render default built-in catalog immediately in 0ms
+    const initParams = new URLSearchParams(window.location.search);
+    selectProduct(initParams.get("product") || "smarty", initParams.get("model") || null);
+
     async function loadCatalog() {
       try {
-        // 1. Try live Supabase product_catalog first so newly created products/models in Admin Dashboard appear immediately
+        let fetchedProducts = [];
         if (sb) {
           const { data, error } = await sb
             .from("product_catalog")
@@ -963,17 +1024,19 @@
                 grouped[row.product_id] = {
                   product_id: row.product_id,
                   product_name: row.product_name,
+                  latest_version: row.latest_version,
                   tagline: row.description || "",
                   accent: row.product_id === "aleda" ? "#38bdf8" : "#f59e0b",
                   models: []
                 };
               }
+              const prodVer = grouped[row.product_id].latest_version;
               grouped[row.product_id].models.push({
                 model_id: row.model_id,
                 model_name: row.model_name,
                 chip: row.chip,
                 hw_rev: row.hw_rev,
-                latest_version: row.latest_version,
+                latest_version: prodVer,
                 version_url: row.version_url || `./firmware/${row.product_id}/${row.model_id}/version.json`,
                 firmware_url: row.firmware_url || `./firmware/${row.product_id}/${row.model_id}/firmware.bin`,
                 bootloader_url: row.bootloader_url || `./firmware/${row.product_id}/${row.model_id}/bootloader.bin`,
@@ -983,27 +1046,29 @@
                 notes: row.release_notes || row.description || ""
               });
             });
-            catalogProducts = Object.values(grouped);
+            fetchedProducts = Object.values(grouped);
           }
         }
 
-        // 2. Fallback to static catalog.json
-        if (catalogProducts.length === 0) {
+        if (fetchedProducts.length === 0) {
           const res = await fetch(`./catalog.json?cb=${Date.now()}`, { cache: "no-store" });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const cat = await res.json();
-          catalogProducts = cat.products || [];
+          if (res.ok) {
+            const cat = await res.json();
+            if (cat.products && cat.products.length > 0) {
+              fetchedProducts = cat.products;
+            }
+          }
         }
 
-        // Support URL query parameter ?product=aleda&model=esp32s3-matter
-        const params = new URLSearchParams(window.location.search);
-        const qProd = params.get("product") || "smarty";
-        const qModel = params.get("model") || null;
-        selectProduct(qProd, qModel);
-      } catch (err) {
-        fwVersionEl.textContent = "Offline";
-        fwNotesEl.textContent = "Failed to load catalog: " + err.message;
-        flashBtn.disabled = true;
+        if (fetchedProducts.length > 0) {
+          catalogProducts = fetchedProducts;
+          const params = new URLSearchParams(window.location.search);
+          const qProd = params.get("product") || (selectedProduct ? selectedProduct.product_id : "smarty");
+          const qModel = params.get("model") || (selectedModel ? selectedModel.model_id : null);
+          selectProduct(qProd, qModel);
+        }
+      } catch (_) {
+        // Keep built-in default catalog active if offline
       }
     }
 
@@ -1052,6 +1117,7 @@
         try {
           await port.open({ baudRate: baud });
           try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
+          await new Promise(r => setTimeout(r, 120));
 
           const writer = port.writable.getWriter();
           await writer.write(new TextEncoder().encode("\ntelemetry\n"));
@@ -1060,12 +1126,22 @@
           reader = port.readable.getReader();
           const decoder = new TextDecoder();
           let buf = "";
-          const deadline = Date.now() + 1000;
+          let retried = false;
+          const startMs = Date.now();
+          const deadline = startMs + 1100;
 
           while (Date.now() < deadline) {
+            if (!retried && Date.now() - startMs > 450 && port.writable) {
+              retried = true;
+              try {
+                const w2 = port.writable.getWriter();
+                await w2.write(new TextEncoder().encode("\ntelemetry\n"));
+                w2.releaseLock();
+              } catch (_) {}
+            }
             const res = await Promise.race([
               reader.read(),
-              new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 200))
+              new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 180))
             ]);
             if (res.timeout) continue;
             if (res.done) break;
@@ -1083,6 +1159,7 @@
                   reader.releaseLock();
                   reader = null;
                   await port.close();
+                  await new Promise(r => setTimeout(r, 80));
                   return json;
                 }
               }
@@ -1094,6 +1171,7 @@
           try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
         }
         try { await port.close(); } catch (_) {}
+        await new Promise(r => setTimeout(r, 80));
       }
       return null;
     }
@@ -1267,7 +1345,8 @@
       let transport = null;
       try {
         modeBadgeEl.textContent = "Mode: Bootloader esptool-js (Preserves NVS)";
-        updateProgress(`Connecting ${selectedModel.chip} Bootloader...`, 4);
+        updateProgress(`Loading esptool-js & Connecting ${selectedModel.chip} Bootloader...`, 4);
+        const { ESPLoader, Transport } = await import("https://unpkg.com/esptool-js@0.4.5/bundle.js");
 
         transport = new Transport(port, true);
         const esploader = new ESPLoader({
@@ -1373,7 +1452,7 @@
         flashBtn.disabled = true;
         espLoaderTerminal.clean();
         updateProgress("Probing connected MAICXEN EDGE device...", 2);
-        logLine("[MAICXEN EDGE] Probing device telemetry @ 9600 baud...");
+        logLine("[MAICXEN EDGE] Probing device telemetry (9600 / 115200 baud)...");
 
         const devInfo = await probeDeviceVersion(port);
         if (devInfo) {
@@ -1435,16 +1514,14 @@
       document.getElementById("tUptime").textContent = `${fmtDur(t.uptime)} / Tot: ${fmtDur(t.total_on_sec)}`;
       document.getElementById("matrixStatusRight").textContent = `${t.hw_id} · ${t.mode || ""} (${t.hex || ""})`;
       renderIdleBitmap(false, t.power ? (t.hex || "#f59e0b") : "#1e293b");
-      document.getElementById("usbQuickControls").style.display = "block";
     }
 
-    window.sendUsbCmd = async function(obj) {
+    async function requestUsbTelemetry() {
       if (!diagPort || !diagPort.writable) return;
       const writer = diagPort.writable.getWriter();
-      const payload = new TextEncoder().encode(JSON.stringify(obj) + "\n");
-      await writer.write(payload);
+      await writer.write(new TextEncoder().encode("telemetry\n"));
       writer.releaseLock();
-    };
+    }
 
     document.getElementById("usbDiagBtn").addEventListener("click", async () => {
       if (diagPort) {
@@ -1453,12 +1530,19 @@
       }
       try {
         diagPort = await navigator.serial.requestPort();
-        await diagPort.open({ baudRate: 9600 });
+        document.getElementById("usbDiagBtn").textContent = "Probing USB...";
+        const initialInfo = await probeDeviceVersion(diagPort);
+        if (initialInfo) {
+          updateTelemetryUI(initialInfo);
+        }
+        await diagPort.open({ baudRate: detectedRuntimeBaud || 9600 });
+        try { await diagPort.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
+        await new Promise(r => setTimeout(r, 80));
         document.getElementById("usbDiagBtn").textContent = "Disconnect USB";
 
-        await window.sendUsbCmd({ cmd: "telemetry" });
+        await requestUsbTelemetry();
         diagTimer = setInterval(() => {
-          if (diagPort) window.sendUsbCmd({ cmd: "telemetry" }).catch(() => {});
+          if (diagPort) requestUsbTelemetry().catch(() => {});
         }, 2500);
 
         const decoder = new TextDecoder();

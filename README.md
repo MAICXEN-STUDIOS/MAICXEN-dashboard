@@ -2,9 +2,9 @@
 
 # ⚡ MAICXEN EDGE — Unified IoT Cloud, Web Flasher & Fleet Ecosystem
 
-**Multi-Product Universal Web Flasher (`v2.3.0`) · Enterprise Fleet Console (`v3.1.0`) · Global OTA Distribution CDN · Supabase PostgreSQL + RLS**
+**Multi-Product Universal Web Flasher (`v2.4.0`) · Enterprise Fleet Console (`v3.1.0`) · Global OTA Distribution CDN · Supabase PostgreSQL + RLS**
 
-[![Web Flasher](https://img.shields.io/badge/Web%20Flasher-v2.3.0%20(%20iot.maicxen.it%20)-f59e0b?style=for-the-badge&logo=googlechrome&logoColor=white)](https://iot.maicxen.it/)
+[![Web Flasher](https://img.shields.io/badge/Web%20Flasher-v2.4.0%20(%20iot.maicxen.it%20)-0a84ff?style=for-the-badge&logo=googlechrome&logoColor=white)](https://iot.maicxen.it/)
 [![Fleet Console](https://img.shields.io/badge/Fleet%20Console-v3.1.0%20(%20%2Fdashboard%2F%20)-06b6d4?style=for-the-badge&logo=shield&logoColor=white)](https://iot.maicxen.it/dashboard/)
 [![Smarty Firmware](https://img.shields.io/badge/Smarty-v1.6.1-10b981?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=smarty)
 [![AledA Firmware](https://img.shields.io/badge/AledA-v1.1.4-38bdf8?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=aleda)

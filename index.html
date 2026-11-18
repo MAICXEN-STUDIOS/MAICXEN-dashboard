@@ -921,59 +921,65 @@
       }
     };
 
-    // Probe connected MAICXEN EDGE device over USB without resetting into bootloader
+    // Probe connected MAICXEN EDGE device over USB (supports both 9600 baud Smarty and 115200 baud AledA)
+    let detectedRuntimeBaud = 9600;
     async function probeDeviceVersion(port) {
-      let reader = null;
-      try {
-        await port.open({ baudRate: 9600 });
-        try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
+      const bauds = (selectedProduct && selectedProduct.product_id === "aleda") ? [115200, 9600] : [9600, 115200];
+      for (const baud of bauds) {
+        let reader = null;
+        try {
+          await port.open({ baudRate: baud });
+          try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
 
-        const writer = port.writable.getWriter();
-        await writer.write(new TextEncoder().encode("\ntelemetry\n"));
-        writer.releaseLock();
+          const writer = port.writable.getWriter();
+          await writer.write(new TextEncoder().encode("\ntelemetry\n"));
+          writer.releaseLock();
 
-        reader = port.readable.getReader();
-        const decoder = new TextDecoder();
-        let buf = "";
-        const deadline = Date.now() + 1400;
+          reader = port.readable.getReader();
+          const decoder = new TextDecoder();
+          let buf = "";
+          const deadline = Date.now() + 1000;
 
-        while (Date.now() < deadline) {
-          const res = await Promise.race([
-            reader.read(),
-            new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 250))
-          ]);
-          if (res.timeout) continue;
-          if (res.done) break;
-          if (res.value) {
-            buf += decoder.decode(res.value, { stream: true });
-            let nl;
-            while ((nl = buf.indexOf("\n")) >= 0) {
-              const line = buf.slice(0, nl).trim();
-              buf = buf.slice(nl + 1);
-              if (line.startsWith("SMARTY_TELEMETRY:") || line.startsWith("MAICXEN_TELEMETRY:")) {
-                const prefix = line.startsWith("SMARTY_TELEMETRY:") ? "SMARTY_TELEMETRY:" : "MAICXEN_TELEMETRY:";
-                const json = JSON.parse(line.slice(prefix.length));
-                await reader.cancel();
-                reader.releaseLock();
-                reader = null;
-                await port.close();
-                return json;
+          while (Date.now() < deadline) {
+            const res = await Promise.race([
+              reader.read(),
+              new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 200))
+            ]);
+            if (res.timeout) continue;
+            if (res.done) break;
+            if (res.value) {
+              buf += decoder.decode(res.value, { stream: true });
+              let nl;
+              while ((nl = buf.indexOf("\n")) >= 0) {
+                const line = buf.slice(0, nl).trim();
+                buf = buf.slice(nl + 1);
+                if (line.startsWith("SMARTY_TELEMETRY:") || line.startsWith("MAICXEN_TELEMETRY:")) {
+                  const prefix = line.startsWith("SMARTY_TELEMETRY:") ? "SMARTY_TELEMETRY:" : "MAICXEN_TELEMETRY:";
+                  const json = JSON.parse(line.slice(prefix.length));
+                  detectedRuntimeBaud = baud;
+                  await reader.cancel();
+                  reader.releaseLock();
+                  reader = null;
+                  await port.close();
+                  return json;
+                }
               }
             }
           }
-        }
-      } catch (_) {}
+        } catch (_) {}
 
-      if (reader) {
-        try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
+        if (reader) {
+          try { await reader.cancel(); reader.releaseLock(); } catch (_) {}
+        }
+        try { await port.close(); } catch (_) {}
       }
-      try { await port.close(); } catch (_) {}
       return null;
     }
 
     function autoMatchProductFromTelemetry(devInfo) {
       if (!devInfo) return;
-      const detectedProd = (devInfo.product_id || (String(devInfo.hw_id || "").toUpperCase().startsWith("ALEDA") ? "aleda" : "smarty")).toLowerCase();
+      const hwStr = String(devInfo.hw_id || "").toUpperCase();
+      const detectedProd = (devInfo.product_id || (hwStr.startsWith("ALEDA") || hwStr.startsWith("AL-") ? "aleda" : "smarty")).toLowerCase();
       const detectedModel = devInfo.model_id || null;
       if (catalogProducts.some(p => p.product_id === detectedProd)) {
         selectProduct(detectedProd, detectedModel);
@@ -986,7 +992,7 @@
       const otaBaud = 921600;
       let reader = null;
       try {
-        await port.open({ baudRate: 9600 });
+        await port.open({ baudRate: detectedRuntimeBaud || 9600 });
         try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (_) {}
 
         let writer = port.writable.getWriter();

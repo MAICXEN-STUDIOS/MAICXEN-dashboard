@@ -2,12 +2,13 @@
 
 # ⚡ MAICXEN EDGE — Unified IoT Cloud, Web Flasher & Fleet Ecosystem
 
-**Multi-Product Universal Web Flasher (`v2.2.0`) · Enterprise Fleet Console (`v3.1.0`) · Global OTA Distribution CDN · Supabase PostgreSQL + RLS**
+**Multi-Product Universal Web Flasher (`v2.3.0`) · Enterprise Fleet Console (`v3.1.0`) · Global OTA Distribution CDN · Supabase PostgreSQL + RLS**
 
-[![Web Flasher](https://img.shields.io/badge/Web%20Flasher-v2.2.0%20(%20iot.maicxen.it%20)-f59e0b?style=for-the-badge&logo=googlechrome&logoColor=white)](https://iot.maicxen.it/)
+[![Web Flasher](https://img.shields.io/badge/Web%20Flasher-v2.3.0%20(%20iot.maicxen.it%20)-f59e0b?style=for-the-badge&logo=googlechrome&logoColor=white)](https://iot.maicxen.it/)
 [![Fleet Console](https://img.shields.io/badge/Fleet%20Console-v3.1.0%20(%20%2Fdashboard%2F%20)-06b6d4?style=for-the-badge&logo=shield&logoColor=white)](https://iot.maicxen.it/dashboard/)
 [![Smarty Firmware](https://img.shields.io/badge/Smarty-v1.6.1-10b981?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=smarty)
 [![AledA Firmware](https://img.shields.io/badge/AledA-v1.1.1-38bdf8?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=aleda)
+[![onIR Firmware](https://img.shields.io/badge/onIR-v1.0.0-a855f7?style=for-the-badge&logo=espressif&logoColor=white)](https://iot.maicxen.it/?product=onir)
 [![Cloud Backend](https://img.shields.io/badge/Database-Supabase%20PostgreSQL%20%2B%20RLS-3ecf8e?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 
 *Engineered by **MAICXEN EDGE***
@@ -54,22 +55,22 @@ Rather than routing real-time light/relay switches through high-latency cloud po
 The ecosystem enforces **three strict, independent versioning layers**:
 
 1. **Web Platform Versions (Independent of Firmware)**:
-   - **Universal Web Flasher**: `v2.1.0` (`FLASHER_VERSION` in [`index.html`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/Maicxen-IoT-Cloud/index.html))
-   - **Enterprise Fleet Console**: `v3.1.0` (`DASHBOARD_VERSION` in [`dashboard/index.html`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/Maicxen-IoT-Cloud/dashboard/index.html))
+   - **Universal Web Flasher**: `v2.1.0` (`FLASHER_VERSION` in [`index.html`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Maicxen-IoT-Cloud/index.html))
+   - **Enterprise Fleet Console**: `v3.1.0` (`DASHBOARD_VERSION` in [`dashboard/index.html`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Maicxen-IoT-Cloud/dashboard/index.html))
 2. **Product Line Versions (Distinct per Product)**:
    - **Smarty** (`product_id: "smarty"`): **`v1.6.0`**
    - **AledA** (`product_id: "aleda"`): **`v1.1.0`**
 3. **Model / Variant Rule (Unified Version, Distinct Binaries)**:
    - Every hardware model/variant under the same `product_id` **must share the exact same Product Version** while serving its own distinct compiled `firmware.bin` binary.
    - Example: Both **AledA Standard (`esp32s3-std`)** and **AledA Matter (`esp32s3-matter`)** carry **`v1.1.0`**, while pointing to `/firmware/aleda/esp32s3-std/firmware.bin` and `/firmware/aleda/esp32s3-matter/firmware.bin` respectively.
-   - **Automatic Enforcement**: A PostgreSQL trigger (`on_product_catalog_sync_version` → `private.sync_product_version_across_models()`) on `public.product_catalog`, together with [`scripts/register_release.py`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/Maicxen-IoT-Cloud/scripts/register_release.py) and each firmware's `copy_firmware.py`, automatically synchronizes `latest_version` across every model sharing the same `product_id`.
+   - **Automatic Enforcement**: A PostgreSQL trigger (`on_product_catalog_sync_version` → `private.sync_product_version_across_models()`) on `public.product_catalog`, together with [`scripts/register_release.py`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Maicxen-IoT-Cloud/scripts/register_release.py) and each firmware's `copy_firmware.py`, automatically synchronizes `latest_version` across every model sharing the same `product_id`.
 
 ---
 
 ## 🗂️ 3. Workspace & Multi-Repository Architecture
 
 ```text
-/Users/maicxenstudios/Documents/PlatformIO/Projects/
+/Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/
 │
 ├── 📁 Maicxen-IoT-Cloud/          🌐 [Web & OTA Hub -> https://iot.maicxen.it]
 │   ├── index.html                 ──► Universal Web Flasher (v2.1.0)
@@ -156,11 +157,11 @@ flowchart TB
 ### Workflow for **Smarty** or **AledA**
 1. **Edit Firmware Code** in the product's PlatformIO workspace (`Smarty/` or `AledA_matter/`).
 2. **Bump the Product Version** (SemVer `MAJOR.MINOR.PATCH`):
-   - **For Smarty**: Update `FIRMWARE_VERSION` in [`Smarty/include/Config.h`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/Smarty/include/Config.h) and `"version"` + `"release_notes"` in [`Smarty/version.json`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/Smarty/version.json).
-   - **For AledA**: Update `FIRMWARE_VERSION` in [`AledA_matter/include/Config.h`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/AledA_matter/include/Config.h) and [`AledA_matter/version.json`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/AledA_matter/version.json). All AledA models automatically receive this same unified version.
+   - **For Smarty**: Update `FIRMWARE_VERSION` in [`Smarty/include/Config.h`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Smarty/include/Config.h) and `"version"` + `"release_notes"` in [`Smarty/version.json`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Smarty/version.json).
+   - **For AledA**: Update `FIRMWARE_VERSION` in [`AledA_matter/include/Config.h`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/AledA_matter/include/Config.h) and [`AledA_matter/version.json`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/AledA_matter/version.json). All AledA models automatically receive this same unified version.
 3. **Compile with PlatformIO**:
    ```bash
-   cd /Users/maicxenstudios/Documents/PlatformIO/Projects/<Smarty|AledA_matter>
+   cd /Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/<Smarty|AledA_matter|onIR_matter>
    /Users/maicxenstudios/.platformio/penv/bin/pio run
    ```
    > The post-build script `scripts/copy_firmware.py` automatically copies `firmware.bin`, `bootloader.bin`, `partitions.bin`, `boot_app0.bin`, and `version.json` into `../Maicxen-IoT-Cloud/firmware/<product_id>/<model_id>/` and updates `catalog.json`.
@@ -168,13 +169,13 @@ flowchart TB
    - Open `https://iot.maicxen.it/dashboard/` → **Products & Catalog**, click **Edit** on any model of that product, set the new **Product Version**, and click **Save Product / Variant to Cloud** (the database trigger automatically updates every model of that `product_id`).
 5. **Deploy Web Hub & Binaries to `https://iot.maicxen.it`**:
    ```bash
-   python3 /Users/maicxenstudios/Documents/PlatformIO/Projects/Maicxen-IoT-Cloud/scripts/publish_ecosystem.py
+   python3 /Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Maicxen-IoT-Cloud/scripts/publish_ecosystem.py
    ```
    Wait ~60 seconds for GitHub Pages CDN propagation. Existing devices in the field will automatically detect the new `version.json` on their next boot or 24-hour FOTA check.
 
 ### Workflow for Updating **Web Flasher** (`flasher/`) or **Fleet Dashboard** (`dashboard/`)
 1. Edit only the relevant sector module (`shared/`, `flasher/`, or `dashboard/`). Shared styling/PCB graphics/version utilities live under `shared/` so improvements update both Web Flasher and Fleet Dashboard together.
-2. Increment `FLASHER_VERSION` or `DASHBOARD_VERSION` in [`shared/js/config.js`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/Maicxen-IoT-Cloud/shared/js/config.js) + update the badges in `index.html` / `dashboard/index.html` and `catalog.json`.
+2. Increment `FLASHER_VERSION` or `DASHBOARD_VERSION` in [`shared/js/config.js`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Maicxen-IoT-Cloud/shared/js/config.js) + update the badges in `index.html` / `dashboard/index.html` and `catalog.json`.
 3. Run `publish_ecosystem.py` (which recursively deploys `shared/`, `flasher/`, `dashboard/`, and `firmware/`) and commit `Maicxen-IoT-Cloud`.
 
 ---
@@ -190,7 +191,7 @@ Example: Adding `esp32s3-pro` under `aleda` (which is on `v1.1.0`):
 2. **Compile & Register Binaries**:
    ```bash
    pio run
-   python3 /Users/maicxenstudios/Documents/PlatformIO/Projects/Maicxen-IoT-Cloud/scripts/register_release.py \
+   python3 /Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Maicxen-IoT-Cloud/scripts/register_release.py \
      aleda esp32s3-pro 1.1.0 /path/to/.pio/build/env_name "v1.1.0 — AledA Pro hardware binary"
    ```
    This creates `firmware/aleda/esp32s3-pro/{firmware,bootloader,partitions,boot_app0}.bin` + `version.json`, aligns `catalog.json`, and publishes to `iot.maicxen.it`.
@@ -202,7 +203,7 @@ Example: Adding `esp32s3-pro` under `aleda` (which is on `v1.1.0`):
 
 Example: Creating a new product **`PixNet`** (`product_id: "pixnet"`, starting at `v1.0.0`):
 
-1. **Create a Sibling PlatformIO Project**: `/Users/maicxenstudios/Documents/PlatformIO/Projects/PixNet/`
+1. **Create a Sibling PlatformIO Project**: `/Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/PixNet/`
 2. **Conform to the MAICXEN EDGE Firmware Contract (`Config.h`)**:
    ```cpp
    constexpr const char* VENDOR_NAME       = "MAICXEN EDGE";
@@ -221,7 +222,7 @@ Example: Creating a new product **`PixNet`** (`product_id: "pixnet"`, starting a
 4. **Register & Publish**:
    - Add the new product in `/dashboard/` → **Products & Catalog**.
    - Run `scripts/register_release.py pixnet esp32s3-std 1.0.0 ../PixNet/.pio/build/esp32s3 "Initial v1.0.0 release"`.
-   - *(Optional)* Add a custom stylized PCB SVG case `if (p === "pixnet")` inside [`shared/js/pcb-visualizer.js`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/Maicxen-IoT-Cloud/shared/js/pcb-visualizer.js) — one single edit automatically updates both Web Flasher and Fleet Dashboard (otherwise both display the generic MAICXEN EDGE ESP32-S3 PCB SVG).
+   - *(Optional)* Add a custom stylized PCB SVG case `if (p === "pixnet")` inside [`shared/js/pcb-visualizer.js`](file:///Users/maicxenstudios/Documents/PlatformIO/Projects/MAICXEN_EDGE_IOT/Maicxen-IoT-Cloud/shared/js/pcb-visualizer.js) — one single edit automatically updates both Web Flasher and Fleet Dashboard (otherwise both display the generic MAICXEN EDGE ESP32-S3 PCB SVG).
 
 ---
 

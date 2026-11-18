@@ -5,11 +5,11 @@
   "model_name": "AledA (esp32s3-std)",
   "chip": "ESP32-S3",
   "hw_rev": "1.0",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/firmware.bin",
   "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/firmware.bin",
   "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/bootloader.bin",
   "partitions_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/partitions.bin",
   "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/boot_app0.bin",
-  "notes": "v1.1.1 — Minor release: unified AledA product line versioning across Standard & Matter models, NVS stats persistence & Pre-Matter FOTA."
+  "notes": "v1.1.2 — Fix Fleet Dashboard false offline status: persistent HTTP/1.1 Keep-Alive TLS telemetry, 10s fast retry, anti-fragmentation JSON buffer reserve & delayed Wi-Fi boot telemetry start."
 }

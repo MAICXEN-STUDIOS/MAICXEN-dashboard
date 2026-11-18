@@ -121,9 +121,10 @@
     <section class="section-view active" id="sec-devices">
       <div class="filter-bar">
         <select id="productFilter" onchange="renderFleet()" style="min-width:170px;">
-          <option value="all">All Products (Smarty, AledA...)</option>
+          <option value="all">All Products (Smarty, AledA, onIR...)</option>
           <option value="smarty">Smarty</option>
           <option value="aleda">AledA</option>
+          <option value="onir">onIR</option>
         </select>
         <input type="text" id="searchFilter" placeholder="Filter by name, Hardware ID, model, or IP..." oninput="renderFleet()" style="width:270px;" />
         <button onclick="syncWithCloudAndDb()">

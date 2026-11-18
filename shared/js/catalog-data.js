@@ -25,7 +25,7 @@ export const DEFAULT_CATALOG_PRODUCTS = [
   {
     product_id: "aleda",
     product_name: "AledA",
-    latest_version: "1.1.1",
+    latest_version: "1.1.2",
     tagline: "Architectural 4-Relay, 4-Dimmer & 3-Strip Controller · Local Web UI · Matter / Voice Sync",
     accent: "#38bdf8",
     models: [
@@ -34,28 +34,28 @@ export const DEFAULT_CATALOG_PRODUCTS = [
         model_name: "AledA Standard Controller (ESP32-S3)",
         chip: "ESP32-S3",
         hw_rev: "1.0",
-        latest_version: "1.1.1",
+        latest_version: "1.1.2",
         version_url: "./firmware/aleda/esp32s3-std/version.json",
         firmware_url: "./firmware/aleda/esp32s3-std/firmware.bin",
         bootloader_url: "./firmware/aleda/esp32s3-std/bootloader.bin",
         partitions_url: "./firmware/aleda/esp32s3-std/partitions.bin",
         boot_app0_url: "./firmware/aleda/esp32s3-std/boot_app0.bin",
         capabilities: ["power", "relays", "dimmers", "strips", "usb_fota", "cloud_fota", "local_web", "alexa"],
-        notes: "v1.1.1 — Added 8KB USB-CDC RX queue, 20ms TX timeout & non-blocking serial parser for Live USB Telemetry and zero-reset WebSerial FOTA."
+        notes: "v1.1.2 — Fix Fleet Dashboard false offline status: persistent HTTP/1.1 Keep-Alive TLS telemetry, 10s fast retry, anti-fragmentation JSON buffer reserve & delayed Wi-Fi boot telemetry start."
       },
       {
         model_id: "esp32s3-matter",
         model_name: "AledA Matter over Wi-Fi Controller (ESP32-S3)",
         chip: "ESP32-S3",
         hw_rev: "1.0",
-        latest_version: "1.1.1",
+        latest_version: "1.1.2",
         version_url: "./firmware/aleda/esp32s3-matter/version.json",
         firmware_url: "./firmware/aleda/esp32s3-matter/firmware.bin",
         bootloader_url: "./firmware/aleda/esp32s3-matter/bootloader.bin",
         partitions_url: "./firmware/aleda/esp32s3-matter/partitions.bin",
         boot_app0_url: "./firmware/aleda/esp32s3-matter/boot_app0.bin",
         capabilities: ["power", "relays", "dimmers", "strips", "matter", "usb_fota", "cloud_fota", "local_web"],
-        notes: "v1.1.1 — Added 8KB USB-CDC RX queue, 20ms TX timeout & non-blocking serial parser for Live USB Telemetry and zero-reset WebSerial FOTA."
+        notes: "v1.1.2 — Fix Fleet Dashboard false offline status: persistent HTTP/1.1 Keep-Alive TLS telemetry, 10s fast retry, anti-fragmentation JSON buffer reserve & delayed Wi-Fi boot telemetry start."
       }
     ]
   },

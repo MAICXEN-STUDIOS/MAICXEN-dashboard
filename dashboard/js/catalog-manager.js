@@ -24,7 +24,11 @@ export function editCatalogEntry(prodId, modId) {
     ? row.capabilities.join(",")
     : "";
   document.getElementById("catNotes").value = row.release_notes || row.description || "";
-  document.getElementById("adminCatalogBox")?.scrollIntoView({ behavior: "smooth" });
+  const box = document.getElementById("adminCatalogBox");
+  if (box) {
+    box.open = true;
+    box.scrollIntoView({ behavior: "smooth" });
+  }
 }
 
 export async function loadProductCatalog(onAfterRender) {
@@ -62,44 +66,48 @@ export async function loadProductCatalog(onAfterRender) {
       const isAdmin = dashboardState.currentProfile?.role === "admin";
       tbody.innerHTML = data
         .map((row) => {
-          const caps = (Array.isArray(row.capabilities) ? row.capabilities : [])
-            .map(
-              (c) =>
-                `<span class="pill" style="background:rgba(255,255,255,0.06);font-size:10px;margin:2px;">${c}</span>`
-            )
-            .join(" ");
+          const capsList = Array.isArray(row.capabilities) ? row.capabilities : [];
+          const capsTitle = capsList.join(", ");
+          const notesSafe = String(row.release_notes || row.description || "No release notes provided.")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
           return `
             <tr>
               <td>
                 <strong>${row.product_name}</strong><br>
-                <span style="color:var(--muted-dash);font-size:11px;">ID: <code>${row.product_id}</code></span>
+                <code>${row.product_id}</code>
               </td>
               <td>
                 <strong>${row.model_name}</strong><br>
-                <span style="color:var(--muted-dash);font-size:11px;">Variant: <code>${row.model_id}</code></span>
+                <code>${row.model_id}</code>
               </td>
               <td>
                 <span class="pill cyan">${row.chip}</span>
-                <span style="font-size:11px;color:var(--muted-dash);margin-left:4px;">Rev ${row.hw_rev}</span>
+                <span style="font-size:11.5px;color:var(--apple-text-tertiary);margin-left:4px;">Rev ${row.hw_rev}</span>
               </td>
               <td>
-                <span class="pill green">v${row.latest_version}</span>
-                <div style="font-size:10.5px;color:var(--muted-dash);margin-top:3px;">${row.release_notes || ""}</div>
+                <div class="ver-popover-wrap" tabindex="0">
+                  <span class="pill green" style="cursor:pointer;">v${row.latest_version} ⓘ</span>
+                  <div class="ver-popover-box">${notesSafe}</div>
+                </div>
               </td>
-              <td>${caps}</td>
               <td>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="pill muted" title="${capsTitle}">${capsList.length} features</span>
+              </td>
+              <td style="text-align:right;">
+                <div class="row-inline" style="justify-content:flex-end;">
                   <a href="../?product=${encodeURIComponent(row.product_id)}&model=${encodeURIComponent(
             row.model_id
-          )}" class="btn-cyan" style="text-decoration:none;padding:5px 9px;border-radius:8px;font-size:11px;">Flash USB &nearr;</a>
+          )}" class="pill-btn">Flash ↗</a>
                   ${
                     isAdmin
-                      ? `<button style="padding:5px 9px;font-size:11px;" onclick="editCatalogEntry('${row.product_id}','${row.model_id}')">Edit</button>`
+                      ? `<button type="button" class="pill-btn" onclick="editCatalogEntry('${row.product_id}','${row.model_id}')">Edit</button>`
                       : ""
                   }
                   ${
                     isAdmin
-                      ? `<button class="btn-danger" style="padding:5px 9px;font-size:11px;" onclick="deleteCatalogEntry('${row.id}')">Delete</button>`
+                      ? `<button type="button" class="pill-btn danger" onclick="deleteCatalogEntry('${row.id}')">Delete</button>`
                       : ""
                   }
                 </div>

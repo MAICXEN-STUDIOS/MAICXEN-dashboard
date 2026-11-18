@@ -10,5 +10,5 @@
   "bootloader_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/bootloader.bin",
   "partitions_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/partitions.bin",
   "boot_app0_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/boot_app0.bin",
-  "notes": "v1.5.0 — Hybrid 921600-baud USB-FOTA with LED Matrix progress bar, Local Web UI & MAICXEN EDGE Cloud Fleet Sync."
+  "notes": "Rilascio v1.5.0: Procedura FOTA Nativa via USB Serial ad alta velocita (921600 baud con CRC16, barra di progresso LED 23x5 sul dispositivo e Dual-OTA Rollback Protection) con rilevamento automatico della versione e fallback automatico a esptool-js per i firmware precedenti."
 }

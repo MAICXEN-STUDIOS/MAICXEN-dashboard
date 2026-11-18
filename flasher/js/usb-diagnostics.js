@@ -10,6 +10,7 @@ import {
 export function createUsbDiagnosticsController({
   getSelectedProduct,
   onTelemetryPacket,
+  onConnectionChange,
   logLine,
   setStatus
 }) {
@@ -18,6 +19,20 @@ export function createUsbDiagnosticsController({
   let diagTimer = null;
   let diagClosing = false;
   let detectedRuntimeBaud = 115200;
+
+  async function sendCommand(rawCmd) {
+    if (!diagPort || !diagPort.writable) return false;
+    const text = String(rawCmd || "").trim();
+    if (!text) return false;
+    const writer = diagPort.writable.getWriter();
+    try {
+      await writer.write(new TextEncoder().encode(`\n${text}\n`));
+      logLine(`[USB TX] ${text}`);
+      return true;
+    } finally {
+      writer.releaseLock();
+    }
+  }
 
   async function requestUsbTelemetry() {
     if (!diagPort || !diagPort.writable) return;
@@ -48,7 +63,9 @@ export function createUsbDiagnosticsController({
       diagPort = null;
     }
     await new Promise((r) => setTimeout(r, 80));
-    document.getElementById("usbDiagBtn").textContent = "Connect USB Telemetry";
+    const btn = document.getElementById("usbDiagBtn");
+    if (btn) btn.textContent = "Connect USB Telemetry";
+    if (onConnectionChange) onConnectionChange(false, 0);
     diagClosing = false;
   }
 
@@ -57,7 +74,9 @@ export function createUsbDiagnosticsController({
     await applySafeSerialSignals(port);
     await new Promise((r) => setTimeout(r, 150));
 
-    document.getElementById("usbDiagBtn").textContent = "Disconnect USB";
+    const btn = document.getElementById("usbDiagBtn");
+    if (btn) btn.textContent = "Disconnect USB";
+    if (onConnectionChange) onConnectionChange(true, baudRate);
     document.getElementById("matrixStatusRight").textContent = `USB Connected @ ${baudRate} bps · Waiting telemetry...`;
     logLine(`[USB] Live Telemetry connected (${baudRate} bps${isNativeEspUsb(port) ? ", Native USB-CDC" : ""})`);
 
@@ -160,6 +179,9 @@ export function createUsbDiagnosticsController({
   return {
     toggleDiagnostics,
     closeUsbDiagnostics,
+    sendCommand,
+    requestUsbTelemetry,
+    isConnected: () => Boolean(diagPort),
     getDetectedBaud: () => detectedRuntimeBaud
   };
 }

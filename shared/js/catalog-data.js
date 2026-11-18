@@ -62,7 +62,7 @@ export const DEFAULT_CATALOG_PRODUCTS = [
   {
     product_id: "onir",
     product_name: "onIR",
-    latest_version: "1.0.0",
+    latest_version: "1.0.1",
     tagline: "Universal Matter-over-WiFi IR Bridge · NVS ON/OFF Profiles · Live IR Learning · Dual-Core",
     accent: "#a855f7",
     models: [
@@ -72,14 +72,14 @@ export const DEFAULT_CATALOG_PRODUCTS = [
         chip: "ESP32",
         hw_rev: "1.0",
         offsets: [4096, 32768, 57344, 65536],
-        latest_version: "1.0.0",
+        latest_version: "1.0.1",
         version_url: "./firmware/onir/esp32-matter/version.json",
         firmware_url: "./firmware/onir/esp32-matter/firmware.bin",
         bootloader_url: "./firmware/onir/esp32-matter/bootloader.bin",
         partitions_url: "./firmware/onir/esp32-matter/partitions.bin",
         boot_app0_url: "./firmware/onir/esp32-matter/boot_app0.bin",
         capabilities: ["power", "ir_tx", "ir_rx", "ir_learn", "matter", "usb_fota", "cloud_fota", "local_web"],
-        notes: "v1.0.0 — Initial MAICXEN EDGE release: Universal Matter IR Bridge with NVS ON/OFF IR profiles, live IR remote capture, dual-core FreeRTOS architecture, Local Web UI, Pre-Matter FOTA & USB-FOTA."
+        notes: "v1.0.1 — Fix Web UI IR form reset caused by ambient RX frames during polling + stricter IR noise filter (>= 12 edges)."
       }
     ]
   }

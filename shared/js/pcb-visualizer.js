@@ -156,6 +156,43 @@ export function buildStylizedPcbSvg(prodId, opts = {}) {
     `;
   }
 
+  if (p === "onir") {
+    const irGlow = isError
+      ? "#ef4444"
+      : progressPct >= 0
+      ? "#06b6d4"
+      : customColor || (isPoweredOn ? "#a855f7" : "#475569");
+    const waveOpacity = progressPct >= 0 ? 0.9 : isPoweredOn ? 0.85 : 0.2;
+    const txLit = progressPct >= 0 || isPoweredOn;
+    const mw = maxWidth || "440px";
+    return `
+      <svg viewBox="0 0 480 200" style="width:100%;max-width:${mw};height:auto;display:block;">
+        <rect x="28" y="18" width="424" height="164" rx="14" fill="#122b54" stroke="#284e8a" stroke-width="2"/>
+        <circle cx="46" cy="36" r="6" fill="#090d16" stroke="#d4a64a" stroke-width="2.5"/>
+        <circle cx="434" cy="36" r="6" fill="#090d16" stroke="#d4a64a" stroke-width="2.5"/>
+        <circle cx="46" cy="164" r="6" fill="#090d16" stroke="#d4a64a" stroke-width="2.5"/>
+        <circle cx="434" cy="164" r="6" fill="#090d16" stroke="#d4a64a" stroke-width="2.5"/>
+        <rect x="16" y="76" width="24" height="48" rx="3" fill="#e2e8f0" stroke="#64748b" stroke-width="1.2"/>
+        <text x="28" y="103" fill="#334155" font-size="6.5" font-weight="800" text-anchor="middle" font-family="monospace">USB</text>
+        <rect x="64" y="54" width="84" height="92" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="106" y="96" fill="#1e293b" font-size="9.5" font-weight="800" text-anchor="middle" font-family="monospace">ESP32</text>
+        <text x="106" y="110" fill="#475569" font-size="7" font-weight="700" text-anchor="middle" font-family="monospace">D1 MINI32</text>
+        <text x="242" y="84" fill="#f8fafc" font-size="15" font-weight="800" text-anchor="middle" font-family="sans-serif">MAICXEN EDGE</text>
+        <text x="242" y="105" fill="${irGlow}" font-size="13" font-weight="800" text-anchor="middle" font-family="monospace">onIR MATTER</text>
+        <text x="242" y="124" fill="#94a3b8" font-size="8" font-weight="600" text-anchor="middle" font-family="monospace">GPIO26 TX · GPIO18 RX</text>
+        <circle cx="364" cy="68" r="14" fill="${txLit ? irGlow : "#1e293b"}" stroke="#cbd5e1" stroke-width="1.5" ${
+      txLit ? `filter="drop-shadow(0 0 8px ${irGlow})"` : ""
+    }/>
+        <text x="364" y="94" fill="#cbd5e1" font-size="7" font-weight="700" text-anchor="middle" font-family="monospace">IR TX</text>
+        <path d="M388 54 Q404 68 388 82" fill="none" stroke="${irGlow}" stroke-width="2.5" stroke-linecap="round" opacity="${waveOpacity}"/>
+        <path d="M398 46 Q420 68 398 90" fill="none" stroke="#00d2ff" stroke-width="2.2" stroke-linecap="round" opacity="${waveOpacity}"/>
+        <rect x="350" y="118" width="28" height="26" rx="3" fill="#0f172a" stroke="#64748b" stroke-width="1.2"/>
+        <circle cx="364" cy="131" r="7" fill="#334155" stroke="#94a3b8" stroke-width="1"/>
+        <text x="364" y="156" fill="#cbd5e1" font-size="7" font-weight="700" text-anchor="middle" font-family="monospace">IR RX 38kHz</text>
+      </svg>
+    `;
+  }
+
   const accent = isError
     ? "#ef4444"
     : progressPct >= 0

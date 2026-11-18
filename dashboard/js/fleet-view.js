@@ -45,6 +45,7 @@ export async function upsertDeviceToSupabase(dev) {
 export function renderFleet() {
   const q = (document.getElementById("searchFilter").value || "").toLowerCase();
   const prodFilter = (document.getElementById("productFilter")?.value || "all").toLowerCase();
+  const statusFilter = (document.getElementById("statusFilter")?.value || "all").toLowerCase();
   const allDevs = Object.values(dashboardState.fleetRegistry).sort(
     (a, b) => (b.last_seen_ms || 0) - (a.last_seen_ms || 0)
   );
@@ -67,7 +68,15 @@ export function renderFleet() {
 
   const filtered = allDevs.filter((d) => {
     const devProd = inferProductId(d);
+    const isOnline = nowMs - (d.last_seen_ms || 0) < 180000;
+    const targetVer = getTargetVersionForDevice(d);
+    const isOutdated = Boolean(d.fw && d.fw !== targetVer);
+
     if (prodFilter !== "all" && devProd !== prodFilter) return false;
+    if (statusFilter === "online" && !isOnline) return false;
+    if (statusFilter === "offline" && isOnline) return false;
+    if (statusFilter === "active" && !d.power) return false;
+    if (statusFilter === "outdated" && !isOutdated) return false;
     if (!q) return true;
     return (
       (d.hw_id || "").toLowerCase().includes(q) ||
@@ -78,15 +87,15 @@ export function renderFleet() {
     );
   });
 
-  const grid = document.getElementById("devicesGrid");
+  const list = document.getElementById("devicesGrid");
   if (!filtered.length) {
-    grid.innerHTML = `<div class="panel-box" style="grid-column:1/-1; text-align:center; color:var(--muted-dash);">
-      No MAICXEN EDGE devices match your current filter. Any Smarty, AledA, or onIR unit will automatically appear here as soon as it connects to Wi-Fi.
+    list.innerHTML = `<div class="fleet-empty">
+      No MAICXEN EDGE devices match your current filter. Any Smarty, AledA, or onIR unit appears automatically as soon as it connects to Wi-Fi.
     </div>`;
     return;
   }
 
-  grid.innerHTML = filtered
+  list.innerHTML = filtered
     .map((d) => {
       const isOnline = nowMs - (d.last_seen_ms || 0) < 180000;
       const targetVer = getTargetVersionForDevice(d);
@@ -94,41 +103,44 @@ export function renderFleet() {
       const devProd = inferProductId(d).toUpperCase();
       const devModel = d.model_id || "esp32s3-std";
       const hasValidIp = d.wifi_ip && d.wifi_ip !== "0.0.0.0";
+      const verTitle = isUpToDate
+        ? `Up to date (v${d.fw || "--"})`
+        : `Update available: v${targetVer}`;
 
       return `
-        <div class="mini-card ${isOnline ? "online" : "offline"}" onclick="openDeviceModal('${d.hw_id}')">
-          <div class="mc-top">
-            <div>
-              <div class="mc-title">
-                <span class="dot ${isOnline ? "on" : "off"}"></span>
-                <span>${d.alias || d.hw_id}</span>
-              </div>
-              <div class="mc-sub">${devProd} (${devModel}) &bull; ${d.hw_id} &bull; ${fmtRelTime(d.last_seen_ms)}</div>
-            </div>
-            <span class="pill ${isUpToDate ? "green" : "amber"}">v${d.fw || "--"}</span>
-          </div>
-
-          <div class="mc-pcb-wrap">
+        <div class="device-row ${isOnline ? "online" : "offline"}" onclick="openDeviceModal('${d.hw_id}')">
+          <div class="device-thumb">
             ${buildStylizedPcbSvg(devProd.toLowerCase(), {
               isPoweredOn: Boolean(d.power),
-              maxWidth: devProd.toLowerCase() === "smarty" ? "230px" : "210px"
+              maxWidth: "74px"
             })}
           </div>
 
-          <div class="mc-status-row">
-            <span><span class="color-dot" style="background:${d.power ? "#10b981" : "#475569"}"></span>${
-        d.power ? "Power: ON" : "Power: OFF"
-      }</span>
-            <span>${d.wifi_ip || "--"} &bull; ${Number(d.temp || 0).toFixed(0)}°C</span>
+          <div class="device-identity">
+            <div class="device-name-line">
+              <span class="status-dot ${isOnline ? "on" : "off"}"></span>
+              <span class="device-name">${d.alias || d.hw_id}</span>
+            </div>
+            <div class="device-sub">${devProd} · ${devModel} · <span class="mono">${d.hw_id}</span> · ${fmtRelTime(d.last_seen_ms)}</div>
           </div>
 
-          <div class="mc-footer">
+          <div class="device-telemetry-inline">
+            <span class="power-chip">
+              <span class="p-dot" style="background:${d.power ? "var(--green)" : "var(--apple-text-tertiary)"}"></span>
+              ${d.power ? "ON" : "OFF"}
+            </span>
+            <span class="mono">${Number(d.temp || 0).toFixed(0)}°C</span>
+            <span class="mono">${hasValidIp ? d.wifi_ip : "—"}</span>
+          </div>
+
+          <div class="device-actions">
+            <span class="pill ${isUpToDate ? "green" : "amber"}" title="${verTitle}">v${d.fw || "--"}</span>
             ${
               hasValidIp
-                ? `<a href="http://${d.wifi_ip}" target="_blank" class="btn-primary" style="text-decoration:none;padding:8px 11px;border-radius:9px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:5px;" onclick="event.stopPropagation()">Open Local UI &nearr;</a>`
-                : `<span style="font-size:11.5px;color:var(--muted-dash);">No Local IP</span>`
+                ? `<a href="http://${d.wifi_ip}" target="_blank" rel="noopener" class="pill-btn" onclick="event.stopPropagation()">Local UI ↗</a>`
+                : ""
             }
-            <button class="btn-cyan" onclick="openDeviceModal('${d.hw_id}', event)">Inspect Telemetry &rarr;</button>
+            <span class="row-chevron" aria-hidden="true">›</span>
           </div>
         </div>
       `;
@@ -143,16 +155,17 @@ export function populateModal(hwId) {
   const isOnline = Date.now() - (d.last_seen_ms || 0) < 180000;
   const targetVer = getTargetVersionForDevice(d);
   const isUpToDate = d.fw === targetVer;
-  const devProd = inferProductId(d).toUpperCase();
+  const devProdSlug = inferProductId(d);
+  const devProd = devProdSlug.toUpperCase();
   const devModel = d.model_id || "esp32s3-std";
 
   document.getElementById("mTitle").textContent = d.alias || d.hw_id;
-  document.getElementById("mSubtitle").textContent = `Product: ${devProd} (${devModel} · Rev ${
+  document.getElementById("mSubtitle").textContent = `${devProd} · ${devModel} (Rev ${
     d.hw_rev || "1.0"
-  }) • ID: ${d.hw_id} • MAC: ${d.mac || "--"}`;
-  document.getElementById("mPcbPreview").innerHTML = buildStylizedPcbSvg(devProd.toLowerCase(), {
+  }) · ${d.hw_id}`;
+  document.getElementById("mPcbPreview").innerHTML = buildStylizedPcbSvg(devProdSlug, {
     isPoweredOn: Boolean(d.power),
-    maxWidth: devProd.toLowerCase() === "smarty" ? "460px" : "380px"
+    maxWidth: "380px"
   });
 
   const pill = document.getElementById("mOnlinePill");
@@ -163,64 +176,69 @@ export function populateModal(hwId) {
   if (d.wifi_ip && d.wifi_ip !== "0.0.0.0") {
     localBtn.href = `http://${d.wifi_ip}`;
     localBtn.style.display = "inline-flex";
-    localBtn.textContent = `Open Local UI (http://${d.wifi_ip}) ↗`;
+    localBtn.textContent = `Open Local UI (${d.wifi_ip}) ↗`;
   } else {
     localBtn.style.display = "none";
   }
 
+  const flashBtn = document.getElementById("mFlashUsbBtn");
+  if (flashBtn) {
+    flashBtn.href = `../?product=${encodeURIComponent(devProdSlug)}&model=${encodeURIComponent(devModel)}`;
+  }
+
   document.getElementById("mOverviewGrid").innerHTML = `
-    <div class="detail-cell"><span>Product Line &amp; Model</span><strong>${devProd} &bull; ${devModel}</strong></div>
-    <div class="detail-cell"><span>Hardware ID &amp; Revision</span><strong>${d.hw_id} (Rev ${d.hw_rev || "1.0"})</strong></div>
-    <div class="detail-cell"><span>Current Power State</span><strong style="color:${
-      d.power ? "var(--green)" : "var(--muted-dash)"
-    };">${d.power ? "POWERED ON" : "STANDBY (OFF)"}</strong></div>
-    <div class="detail-cell"><span>Installed Firmware</span><strong>v${d.fw || "--"} (${
+    <div class="kv-row"><span>Product &amp; Model</span><strong>${devProd} · ${devModel}</strong></div>
+    <div class="kv-row"><span>Hardware ID</span><strong class="mono">${d.hw_id} (Rev ${d.hw_rev || "1.0"})</strong></div>
+    <div class="kv-row"><span>Power State</span><strong style="color:${
+      d.power ? "var(--green)" : "var(--apple-text-secondary)"
+    };">${d.power ? "Powered ON" : "Standby (OFF)"}</strong></div>
+    <div class="kv-row"><span>Firmware</span><strong class="mono">v${d.fw || "--"} · ${
     isUpToDate ? "Up to date" : "v" + targetVer + " available"
-  })</strong></div>
-    <div class="detail-cell"><span>Wi-Fi SSID &amp; Signal</span><strong>${d.wifi_ssid || "--"} (${d.rssi || 0} dBm)</strong></div>
-    <div class="detail-cell"><span>MCU SoC Temp &amp; Free RAM</span><strong>${Number(d.temp || 0).toFixed(
+  }</strong></div>
+    <div class="kv-row"><span>Wi-Fi Signal</span><strong>${d.wifi_ssid || "--"} (${d.rssi || 0} dBm)</strong></div>
+    <div class="kv-row"><span>Temp &amp; Free RAM</span><strong class="mono">${Number(d.temp || 0).toFixed(
       1
-    )} °C &bull; ${Math.round((d.heap_free || 0) / 1024)} KB</strong></div>
+    )}°C · ${Math.round((d.heap_free || 0) / 1024)} KB</strong></div>
   `;
 
   document.getElementById("mTelemGrid").innerHTML = `
-    <div class="detail-cell"><span>Last Connected</span><strong>${
+    <div class="kv-row"><span>Last Connected</span><strong>${
       d.last_seen_ms ? new Date(Number(d.last_seen_ms)).toLocaleString("en-GB") : "N/A"
     }</strong></div>
-    <div class="detail-cell"><span>First Registered</span><strong>${
+    <div class="kv-row"><span>First Registered</span><strong>${
       d.first_registered_ms ? new Date(Number(d.first_registered_ms)).toLocaleString("en-GB") : "N/A"
     }</strong></div>
-    <div class="detail-cell"><span>Last Powered ON</span><strong>${fmtTs(d.last_on_ts)}</strong></div>
-    <div class="detail-cell"><span>Last Powered OFF</span><strong>${fmtTs(d.last_off_ts)}</strong></div>
-    <div class="detail-cell"><span>Cumulative On-Time</span><strong>${fmtDur(d.total_on_sec)}</strong></div>
-    <div class="detail-cell"><span>Session Uptime / Boots</span><strong>${fmtDur(d.uptime)} (${
+    <div class="kv-row"><span>Last Powered ON</span><strong>${fmtTs(d.last_on_ts)}</strong></div>
+    <div class="kv-row"><span>Last Powered OFF</span><strong>${fmtTs(d.last_off_ts)}</strong></div>
+    <div class="kv-row"><span>Cumulative On-Time</span><strong class="mono">${fmtDur(d.total_on_sec)}</strong></div>
+    <div class="kv-row"><span>Session Uptime</span><strong class="mono">${fmtDur(d.uptime)} (${
     d.boot_count || 1
   } boots)</strong></div>
-    <div class="detail-cell"><span>Wi-Fi Network &amp; RSSI</span><strong>${d.wifi_ssid || "--"} (${d.rssi || 0} dBm)</strong></div>
-    <div class="detail-cell"><span>Local IPv4 Address</span><strong><a href="http://${
-      d.wifi_ip
-    }" target="_blank" style="color:var(--cyan);">http://${d.wifi_ip || "--"} &nearr;</a></strong></div>
-    <div class="detail-cell"><span>ESP32-S3 SoC Temp</span><strong>${Number(d.temp || 0).toFixed(1)} °C</strong></div>
-    <div class="detail-cell"><span>RAM Heap (Free / Min)</span><strong>${Math.round(
+    <div class="kv-row"><span>Local IPv4</span><strong class="mono">${
+      d.wifi_ip && d.wifi_ip !== "0.0.0.0"
+        ? `<a href="http://${d.wifi_ip}" target="_blank" rel="noopener">http://${d.wifi_ip} ↗</a>`
+        : "--"
+    }</strong></div>
+    <div class="kv-row"><span>Heap (Free / Min)</span><strong class="mono">${Math.round(
       (d.heap_free || 0) / 1024
     )} KB / ${Math.round((d.heap_min || 0) / 1024)} KB</strong></div>
   `;
 
   document.getElementById("mSysGrid").innerHTML = `
-    <div class="detail-cell"><span>Installed Firmware</span><strong>v${d.fw || "--"} (${
-    isUpToDate ? "Up to date" : "Update v" + targetVer + " available"
+    <div class="kv-row"><span>Installed Firmware</span><strong class="mono">v${d.fw || "--"} (${
+    isUpToDate ? "Up to date" : "v" + targetVer + " available"
   })</strong></div>
-    <div class="detail-cell"><span>Active OTA Partition</span><strong>${
+    <div class="kv-row"><span>Active OTA Partition</span><strong class="mono">${
       d.ota_part || "app0"
-    } (Dual-OTA Rollback)</strong></div>
-    <div class="detail-cell"><span>FOTA Engine Status</span><strong>${d.fota_status || "Ready"}</strong></div>
-    <div class="detail-cell"><span>Native USB FOTA</span><strong>${
-      d.serial_ota ? "Supported (921600 baud CRC16)" : "Bootloader Mode"
     }</strong></div>
-    <div class="detail-cell"><span>Cloud / Ecosystem Sync</span><strong>${
-      d.cloud_online ? "Connected (ONLINE)" : "Disconnected"
+    <div class="kv-row"><span>FOTA Status</span><strong>${d.fota_status || "Ready"}</strong></div>
+    <div class="kv-row"><span>USB-FOTA Support</span><strong>${
+      d.serial_ota ? "Native CRC-16" : "Bootloader Mode"
     }</strong></div>
-    <div class="detail-cell"><span>Hardware MAC Address</span><strong>${d.mac || "--"}</strong></div>
+    <div class="kv-row"><span>Cloud Sync</span><strong>${
+      d.cloud_online ? "Online" : "Disconnected"
+    }</strong></div>
+    <div class="kv-row"><span>MAC Address</span><strong class="mono">${d.mac || "--"}</strong></div>
   `;
 }
 

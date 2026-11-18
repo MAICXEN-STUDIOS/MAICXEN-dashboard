@@ -126,9 +126,9 @@ export function createUsbDiagnosticsController({
       const selectedProduct = getSelectedProduct();
       const primaryBaud = nativeUsb
         ? 115200
-        : selectedProduct && selectedProduct.product_id === "aleda"
-        ? 115200
-        : 9600;
+        : selectedProduct && selectedProduct.product_id === "smarty"
+        ? 9600
+        : 115200;
       const altBaud = primaryBaud === 115200 ? 9600 : 115200;
 
       document.getElementById("usbDiagBtn").textContent = "Connecting USB...";

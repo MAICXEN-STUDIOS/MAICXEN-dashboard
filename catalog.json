@@ -1,0 +1,67 @@
+{
+  "organization": "MAICXEN EDGE",
+  "domain": "iot.maicxen.it",
+  "updated_at": "2026-11-18T08:30:00Z",
+  "products": [
+    {
+      "product_id": "smarty",
+      "product_name": "Smarty",
+      "tagline": "23×5 Addressable RGB Matrix · Capacitive Touch · Ambient Lux · Hybrid USB/Cloud FOTA",
+      "icon": "grid",
+      "accent": "#f59e0b",
+      "models": [
+        {
+          "model_id": "esp32s3-std",
+          "model_name": "Smarty 23×5 RGB Matrix (ESP32-S3)",
+          "chip": "ESP32-S3",
+          "hw_rev": "1.0",
+          "latest_version": "1.5.0",
+          "version_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/version.json",
+          "firmware_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/firmware.bin",
+          "bootloader_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/bootloader.bin",
+          "partitions_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/partitions.bin",
+          "boot_app0_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/boot_app0.bin",
+          "capabilities": ["power", "brightness", "rgb", "effects", "usb_fota", "cloud_fota", "ambient_lux", "local_web", "alexa"],
+          "notes": "v1.5.0 — Hybrid 921600-baud USB-FOTA with LED Matrix progress bar, Local Web UI & MAICXEN EDGE Cloud Fleet Sync."
+        }
+      ]
+    },
+    {
+      "product_id": "aleda",
+      "product_name": "AledA",
+      "tagline": "Architectural Addressable LED Luminaire Controller · Local Web UI · Matter / Voice Sync",
+      "icon": "sun",
+      "accent": "#38bdf8",
+      "models": [
+        {
+          "model_id": "esp32s3-std",
+          "model_name": "AledA Smart LED Controller (ESP32-S3)",
+          "chip": "ESP32-S3",
+          "hw_rev": "1.0",
+          "latest_version": "1.0.0",
+          "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/version.json",
+          "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/firmware.bin",
+          "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/bootloader.bin",
+          "partitions_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/partitions.bin",
+          "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/boot_app0.bin",
+          "capabilities": ["power", "brightness", "rgb", "effects", "cloud_fota", "local_web", "alexa"],
+          "notes": "v1.0.0 — MAICXEN EDGE ecosystem release for AledA Smart LED Controller."
+        },
+        {
+          "model_id": "esp32s3-matter",
+          "model_name": "AledA Matter over Wi-Fi Controller (ESP32-S3)",
+          "chip": "ESP32-S3",
+          "hw_rev": "1.0",
+          "latest_version": "1.0.0",
+          "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/version.json",
+          "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/firmware.bin",
+          "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/bootloader.bin",
+          "partitions_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/partitions.bin",
+          "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/boot_app0.bin",
+          "capabilities": ["power", "brightness", "rgb", "matter", "cloud_fota", "local_web"],
+          "notes": "v1.0.0 — Native Matter-over-WiFi 8MB Dual-OTA build for Apple HomeKit, Google Home & Alexa."
+        }
+      ]
+    }
+  ]
+}

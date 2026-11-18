@@ -3,16 +3,45 @@ import { supabase, dashboardState } from "./supabase-client.js";
 export function renderEventLogs() {
   const box = document.getElementById("eventsLog");
   if (!box) return;
-  if (!dashboardState.eventLogs.length) {
-    box.innerHTML = "<div style='color:var(--muted-dash)'>No activity events recorded yet.</div>";
+  const q = (document.getElementById("logSearchFilter")?.value || "").trim().toLowerCase();
+  const rows = q
+    ? dashboardState.eventLogs.filter(
+        (e) =>
+          (e.hwId || "").toLowerCase().includes(q) ||
+          (e.eventType || "").toLowerCase().includes(q) ||
+          (e.detail || "").toLowerCase().includes(q)
+      )
+    : dashboardState.eventLogs;
+
+  if (!rows.length) {
+    box.innerHTML = `<div class="fleet-empty">No activity events match the current filter.</div>`;
     return;
   }
-  box.innerHTML = dashboardState.eventLogs
-    .map(
-      (e) =>
-        `<div class="log-entry"><span style="color:var(--muted-dash)">[${e.time}]</span> <strong style="color:var(--cyan)">${e.hwId}</strong> &bull; <span style="color:var(--green)">${e.eventType}</span> — ${e.detail}</div>`
-    )
+  box.innerHTML = rows
+    .map((e) => {
+      const t = String(e.eventType || "").toUpperCase();
+      const cls = t.includes("BOOT") ? "cyan" : t.includes("OFF") ? "muted" : "green";
+      return `
+        <div class="log-entry">
+          <span class="log-time">${e.time}</span>
+          <span class="log-hwid">${e.hwId}</span>
+          <span class="pill ${cls} log-type">${e.eventType}</span>
+          <span class="log-detail">${e.detail}</span>
+        </div>
+      `;
+    })
     .join("");
+}
+
+export function exportEventLog() {
+  const lines = dashboardState.eventLogs.map((e) => `[${e.time}] ${e.hwId} | ${e.eventType} | ${e.detail}`);
+  const blob = new Blob([lines.join("\n") + "\n"], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `maicxen-fleet-activity-${Date.now()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export async function loadEventsFromSupabase() {

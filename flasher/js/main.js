@@ -20,12 +20,21 @@ const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE
 let catalogProducts = DEFAULT_CATALOG_PRODUCTS;
 let selectedProduct = catalogProducts[0];
 let selectedModel = catalogProducts[0].models[0];
+let localFirmwareFile = null; // { name, bytes: Uint8Array, sha256 }
 
+// Core DOM References
 const pcbVisEl = document.getElementById("pcbVisualizer");
 const productTabsEl = document.getElementById("productTabs");
+const heroProductTitleEl = document.getElementById("heroProductTitle");
+const heroProductTaglineEl = document.getElementById("heroProductTagline");
 const modelSelectEl = document.getElementById("modelSelect");
 const selectedModelTitleEl = document.getElementById("selectedModelTitle");
 const fwVersionEl = document.getElementById("fwVersion");
+const fwVersionBtn = document.getElementById("fwVersionBtn");
+const versionPopoverAnchor = document.getElementById("versionPopoverAnchor");
+const popoverModelNameEl = document.getElementById("popoverModelName");
+const popoverChipEl = document.getElementById("popoverChip");
+const popoverDownloadBinEl = document.getElementById("popoverDownloadBin");
 const fwNotesEl = document.getElementById("fwNotes");
 const capTagsEl = document.getElementById("capTags");
 const modeBadgeEl = document.getElementById("modeBadge");
@@ -38,6 +47,63 @@ const statusBanner = document.getElementById("statusBanner");
 const consoleLog = document.getElementById("consoleLog");
 const consoleDetails = document.getElementById("consoleDetails");
 
+// Diagnostics & Tools DOM References
+const diagConnDot = document.getElementById("diagConnDot");
+const diagConnLabel = document.getElementById("diagConnLabel");
+const diagRefreshBtn = document.getElementById("diagRefreshBtn");
+const diagFotaBtn = document.getElementById("diagFotaBtn");
+const diagRebootBtn = document.getElementById("diagRebootBtn");
+const serialCmdInput = document.getElementById("serialCmdInput");
+const sendSerialCmdBtn = document.getElementById("sendSerialCmdBtn");
+const localBinInput = document.getElementById("localBinInput");
+const chooseBinBtn = document.getElementById("chooseBinBtn");
+const localBinNameEl = document.getElementById("localBinName");
+const localBinMetaEl = document.getElementById("localBinMeta");
+const localBinActionRow = document.getElementById("localBinActionRow");
+const localBinShaEl = document.getElementById("localBinSha");
+const flashLocalBinBtn = document.getElementById("flashLocalBinBtn");
+const toolDownloadBinEl = document.getElementById("toolDownloadBin");
+const toolOpenManifestEl = document.getElementById("toolOpenManifest");
+const copyDeepLinkBtn = document.getElementById("copyDeepLinkBtn");
+
+// --- View Switching (Flash / Diagnostics / Tools) ---
+function switchView(viewName) {
+  document.querySelectorAll(".view-tab").forEach((btn) => {
+    const isMatch = btn.dataset.view === viewName;
+    btn.classList.toggle("active", isMatch);
+    btn.setAttribute("aria-selected", isMatch ? "true" : "false");
+  });
+  document.querySelectorAll(".view-panel").forEach((panel) => {
+    panel.classList.toggle("active", panel.id === `view-${viewName}`);
+  });
+}
+
+document.querySelectorAll(".view-tab").forEach((btn) => {
+  btn.addEventListener("click", () => switchView(btn.dataset.view));
+});
+
+// --- Release Notes Popover (Click + Hover + Escape/Outside Close) ---
+function setPopoverOpen(open) {
+  versionPopoverAnchor.classList.toggle("open", open);
+  fwVersionBtn.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+fwVersionBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  setPopoverOpen(!versionPopoverAnchor.classList.contains("open"));
+});
+
+document.addEventListener("click", (e) => {
+  if (!versionPopoverAnchor.contains(e.target)) {
+    setPopoverOpen(false);
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") setPopoverOpen(false);
+});
+
+// --- Visualizers & Logging ---
 function renderIdleBitmap(isError = false, customColor = null) {
   const prodId = selectedProduct ? selectedProduct.product_id : "smarty";
   pcbVisEl.innerHTML = buildStylizedPcbSvg(prodId, { progressPct: -1, isError, customColor });
@@ -73,19 +139,21 @@ function updateProgress(stepText, pct) {
   renderMatrixProgress(clamped);
 }
 
+// --- Product & Model Selection ---
 function renderProductTabs() {
   productTabsEl.innerHTML = "";
   catalogProducts.forEach((prod) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "product-tab" + (selectedProduct && selectedProduct.product_id === prod.product_id ? " active" : "");
+    const isActive = selectedProduct && selectedProduct.product_id === prod.product_id;
+    btn.className = "product-seg-btn" + (isActive ? " active" : "");
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-selected", isActive ? "true" : "false");
     const prodVer = prod.latest_version || prod.models?.[0]?.latest_version || "1.0.0";
     btn.innerHTML = `
-      <div class="product-tab-top">
-        <span class="product-tab-name">${prod.product_name}</span>
-        <span class="product-tab-chip">v${prodVer}</span>
-      </div>
-      <div class="product-tab-desc">${prod.tagline || `${prod.models.length} hardware variant(s)`}</div>
+      <span class="product-dot" style="background:${prod.accent || "#0a84ff"};"></span>
+      <span>${prod.product_name}</span>
+      <span class="product-seg-ver">v${prodVer}</span>
     `;
     btn.addEventListener("click", () => selectProduct(prod.product_id));
     productTabsEl.appendChild(btn);
@@ -98,11 +166,25 @@ function selectModel(modelId) {
   if (!selectedModel) return;
 
   const unifiedVer = selectedProduct.latest_version || selectedModel.latest_version || "1.0.0";
-  selectedModelTitleEl.textContent = `${selectedProduct.product_name} — ${selectedModel.model_name}`;
+  const baseDir = `./firmware/${selectedProduct.product_id}/${selectedModel.model_id}`;
+  const fwUrl = selectedModel.firmware_url || `${baseDir}/firmware.bin`;
+  const verUrl = selectedModel.version_url || `${baseDir}/version.json`;
+
+  heroProductTitleEl.textContent = selectedProduct.product_name;
+  heroProductTaglineEl.textContent = selectedProduct.tagline || "MAICXEN EDGE Hardware Platform";
+  selectedModelTitleEl.textContent = `${selectedModel.model_name} · ${selectedModel.chip}`;
   fwVersionEl.textContent = `v${unifiedVer}`;
+  popoverModelNameEl.textContent = `${selectedProduct.product_name} v${unifiedVer}`;
+  popoverChipEl.textContent = `${selectedModel.chip} · Rev ${selectedModel.hw_rev || "1.0"}`;
   fwNotesEl.textContent = selectedModel.notes || selectedModel.release_notes || "Ready for WebSerial deployment.";
-  document.getElementById("matrixLeftLabel").textContent = `${selectedProduct.product_name} (v${unifiedVer}) · ${selectedModel.chip} Hardware Render`;
-  renderIdleBitmap(false, selectedProduct.accent || "#f59e0b");
+  popoverDownloadBinEl.href = fwUrl;
+  popoverDownloadBinEl.download = `${selectedProduct.product_id}-${selectedModel.model_id}-v${unifiedVer}.bin`;
+  toolDownloadBinEl.href = fwUrl;
+  toolDownloadBinEl.download = `${selectedProduct.product_id}-${selectedModel.model_id}-v${unifiedVer}.bin`;
+  toolOpenManifestEl.href = verUrl;
+
+  document.getElementById("matrixLeftLabel").textContent = `${selectedProduct.product_name} · ${selectedModel.chip}`;
+  renderIdleBitmap(false, selectedProduct.accent || "#0a84ff");
 
   capTagsEl.innerHTML = "";
   (selectedModel.capabilities || []).forEach((cap) => {
@@ -127,7 +209,7 @@ function selectProduct(productId, preferredModelId = null) {
   selectedProduct.models.forEach((m) => {
     const opt = document.createElement("option");
     opt.value = m.model_id;
-    opt.textContent = `${m.model_name} — ${m.chip} · Rev ${m.hw_rev || "1.0"} (Firmware v${unifiedVer})`;
+    opt.textContent = `${m.model_name} (${m.chip})`;
     modelSelectEl.appendChild(opt);
   });
 
@@ -149,29 +231,38 @@ function autoMatchProductFromTelemetry(devInfo, preserveModelSelection = false) 
   }
   if (catalogProducts.some((p) => p.product_id === detectedProd)) {
     selectProduct(detectedProd, targetModel);
-    document.getElementById("autoDetectBadge").textContent = `Auto-Detected: ${detectedProd.toUpperCase()} (${devInfo.hw_id || "USB"})`;
+    document.getElementById("autoDetectBadge").textContent = `Detected via USB · ${detectedProd.toUpperCase()} (${devInfo.hw_id || "ESP32"})`;
   }
 }
 
 function updateTelemetryUI(t) {
   autoMatchProductFromTelemetry(t);
-  document.getElementById("tHwId").textContent = `${t.hw_id || "ESP32"} (${t.product_id || t.profile || "MAICXEN"})`;
+  document.getElementById("tHwId").textContent = `${t.hw_id || "ESP32"} · ${t.product_id || t.profile || "MAICXEN"}`;
   document.getElementById("tFwPart").textContent = `v${t.fw || "?"} (${t.ota_part || "app0"})`;
   document.getElementById("tModeState").textContent = `${t.power ? "ON" : "OFF"} · ${t.mode || `${t.active_channels ?? 0} ch`} (${t.brightness ?? 100}%)`;
   document.getElementById("tWifi").textContent = t.wifi_ssid ? `${t.wifi_ssid} (${t.rssi} dBm)` : "Disconnected";
 
   const ipEl = document.getElementById("tIpLink");
   if (t.wifi_ip && t.wifi_ip !== "0.0.0.0") {
-    ipEl.innerHTML = `<a href="http://${t.wifi_ip}" target="_blank" style="color:var(--blue);">http://${t.wifi_ip} &nearr;</a>`;
+    ipEl.innerHTML = `<a href="http://${t.wifi_ip}" target="_blank" rel="noopener">http://${t.wifi_ip} ↗</a>`;
   } else {
     ipEl.textContent = "N/A";
   }
 
-  document.getElementById("tCloud").textContent = t.cloud_online ? "Connected (ONLINE)" : "Offline";
+  document.getElementById("tCloud").textContent = t.cloud_online ? "Online" : "Offline";
   document.getElementById("tTempHeap").textContent = `${Number(t.temp || 0).toFixed(1)}°C · ${Math.round((t.heap_free || 0) / 1024)} KB free`;
-  document.getElementById("tUptime").textContent = `${fmtDur(t.uptime)} / Tot: ${fmtDur(t.total_on_sec)}`;
-  document.getElementById("matrixStatusRight").textContent = `${t.hw_id} · ${t.mode || ""} ${t.hex ? `(${t.hex})` : ""}`;
-  renderIdleBitmap(false, t.power ? t.hex || (selectedProduct && selectedProduct.accent) || "#f59e0b" : "#1e293b");
+  document.getElementById("tUptime").textContent = `${fmtDur(t.uptime)} / Tot ${fmtDur(t.total_on_sec)}`;
+  document.getElementById("matrixStatusRight").textContent = `${t.hw_id} · ${t.mode || ""}`;
+  renderIdleBitmap(false, t.power ? t.hex || (selectedProduct && selectedProduct.accent) || "#0a84ff" : "#1e293b");
+}
+
+function handleDiagConnectionChange(connected, baud) {
+  diagConnDot.classList.toggle("online", connected);
+  diagConnLabel.textContent = connected ? `Connected over USB @ ${baud} bps` : "Not connected";
+  diagRefreshBtn.disabled = !connected;
+  diagFotaBtn.disabled = !connected;
+  diagRebootBtn.disabled = !connected;
+  sendSerialCmdBtn.disabled = !connected;
 }
 
 const espLoaderTerminal = {
@@ -190,6 +281,7 @@ const espLoaderTerminal = {
 const usbDiag = createUsbDiagnosticsController({
   getSelectedProduct: () => selectedProduct,
   onTelemetryPacket: updateTelemetryUI,
+  onConnectionChange: handleDiagConnectionChange,
   logLine,
   setStatus
 });
@@ -207,6 +299,7 @@ async function loadCatalog() {
   } catch (_) {}
 }
 
+// --- Primary Cloud Flash Workflow ---
 flashBtn.addEventListener("click", async () => {
   if (!selectedProduct || !selectedModel) return;
   await usbDiag.closeUsbDiagnostics();
@@ -237,11 +330,11 @@ flashBtn.addEventListener("click", async () => {
       const verCmp = compareVersions(devInfo.fw, targetVer);
       if (verCmp >= 0 && !forceFlash) {
         await safeClosePort(port);
-        updateProgress("Already Up to Date (Upload Skipped)", 100);
+        updateProgress("Already Up to Date", 100);
         logLine(`[MAICXEN EDGE] Version check: installed v${devInfo.fw} >= target v${targetVer}. Upload skipped.`);
         setStatus(
           "success",
-          `${selectedProduct.product_name} (${devInfo.hw_id}) is already up to date on v${devInfo.fw} (target release: v${targetVer}). Upload skipped.`
+          `${selectedProduct.product_name} (${devInfo.hw_id}) is already up to date on v${devInfo.fw}. Enable Force Re-flash to overwrite.`
         );
         return;
       }
@@ -257,8 +350,8 @@ flashBtn.addEventListener("click", async () => {
     const fwUrl = selectedModel.firmware_url || `${baseDir}/firmware.bin`;
 
     if (meetsThreshold) {
-      modeBadgeEl.textContent = `Mode: Seamless USB-FOTA (v${devInfo.fw} -> v${selectedModel.latest_version})`;
-      updateProgress("Downloading firmware binary for USB-FOTA...", 6);
+      modeBadgeEl.textContent = `Native USB-FOTA (v${devInfo.fw} → v${selectedModel.latest_version})`;
+      updateProgress("Downloading firmware binary...", 6);
       const fwRes = await fetch(`${fwUrl}?cb=${Date.now()}`, { cache: "no-store" });
       if (!fwRes.ok) throw new Error(`Failed to fetch ${fwUrl} (HTTP ${fwRes.status})`);
       const fwBytes = new Uint8Array(await fwRes.arrayBuffer());
@@ -319,7 +412,139 @@ flashBtn.addEventListener("click", async () => {
   }
 });
 
-// Init UI immediately in 0ms, then sync live catalog
+// --- Tools: Custom Local .bin Upload with SHA-256 ---
+async function computeSha256Hex(uint8Arr) {
+  if (!window.crypto || !window.crypto.subtle) return "Unavailable (non-HTTPS)";
+  const hashBuf = await window.crypto.subtle.digest("SHA-256", uint8Arr);
+  return Array.from(new Uint8Array(hashBuf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+chooseBinBtn.addEventListener("click", () => localBinInput.click());
+
+localBinInput.addEventListener("change", async () => {
+  const file = localBinInput.files && localBinInput.files[0];
+  if (!file) return;
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const sha = await computeSha256Hex(bytes);
+  localFirmwareFile = { name: file.name, bytes, sha256: sha };
+  localBinNameEl.textContent = file.name;
+  localBinMetaEl.textContent = `${(bytes.length / 1024).toFixed(1)} KB (${bytes.length.toLocaleString()} bytes)`;
+  localBinShaEl.textContent = sha;
+  localBinActionRow.style.display = "flex";
+});
+
+flashLocalBinBtn.addEventListener("click", async () => {
+  if (!localFirmwareFile) return;
+  await usbDiag.closeUsbDiagnostics();
+  switchView("flash");
+
+  let port = null;
+  try {
+    setStatus(null, "");
+    port = await navigator.serial.requestPort();
+    flashBtn.disabled = true;
+    flashLocalBinBtn.disabled = true;
+    espLoaderTerminal.clean();
+    updateProgress("Probing device for local binary USB-FOTA...", 4);
+    logLine(`[MAICXEN EDGE] Local Binary: ${localFirmwareFile.name} (${localFirmwareFile.bytes.length} B)`);
+    logLine(`[MAICXEN EDGE] SHA-256: ${localFirmwareFile.sha256}`);
+
+    const probe = await openAndProbeOnSamePort(
+      port,
+      selectedProduct ? selectedProduct.product_id : "smarty",
+      logLine
+    );
+    if (!probe.devInfo) {
+      throw new Error("Local .bin quick-flash requires an active MAICXEN EDGE firmware with USB-FOTA support.");
+    }
+    modeBadgeEl.textContent = `Local USB-FOTA · ${localFirmwareFile.name}`;
+    const res = await runNativeUsbFota({
+      port,
+      fwBytes: localFirmwareFile.bytes,
+      targetVer: "custom-local",
+      probeCtx: probe,
+      productName: selectedProduct ? selectedProduct.product_name : "MAICXEN EDGE",
+      modelName: localFirmwareFile.name,
+      logLine,
+      updateProgress,
+      setStatus
+    });
+    if (!res.ok) throw res.error || new Error("Local USB-FOTA failed");
+  } catch (err) {
+    if (port) await safeClosePort(port);
+    consoleDetails.open = true;
+    renderIdleBitmap(true);
+    logLine(`ERROR: ${err.message || err}`);
+    setStatus("error", `Local flash failed: ${err.message || err}`);
+  } finally {
+    flashBtn.disabled = false;
+    flashLocalBinBtn.disabled = false;
+  }
+});
+
+// --- Diagnostics Quick Actions & Serial Console ---
+diagRefreshBtn.addEventListener("click", () => usbDiag.requestUsbTelemetry().catch(() => {}));
+diagFotaBtn.addEventListener("click", () => usbDiag.sendCommand('{"action":"fota_check"}').catch(() => {}));
+diagRebootBtn.addEventListener("click", () => {
+  if (confirm("Reboot the connected MAICXEN EDGE device now?")) {
+    usbDiag.sendCommand('{"action":"reboot"}').catch(() => {});
+  }
+});
+
+async function submitSerialCommand() {
+  const val = serialCmdInput.value.trim();
+  if (!val) return;
+  try {
+    const ok = await usbDiag.sendCommand(val);
+    if (ok) serialCmdInput.value = "";
+  } catch (e) {
+    logLine(`[USB TX Error] ${e.message || e}`);
+  }
+}
+
+sendSerialCmdBtn.addEventListener("click", submitSerialCommand);
+serialCmdInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") submitSerialCommand();
+});
+
+// --- Log Copy / Clear / Export & Share Deep-Link ---
+function copyConsoleText(btn) {
+  const txt = consoleLog.textContent || "";
+  if (!txt) return;
+  navigator.clipboard?.writeText(txt).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = "Copied";
+    setTimeout(() => { btn.textContent = orig; }, 1400);
+  });
+}
+
+document.getElementById("copyLogBtn").addEventListener("click", (e) => copyConsoleText(e.currentTarget));
+document.getElementById("toolsCopyLogBtn").addEventListener("click", (e) => copyConsoleText(e.currentTarget));
+document.getElementById("clearLogBtn").addEventListener("click", () => { consoleLog.textContent = ""; });
+
+document.getElementById("exportLogBtn").addEventListener("click", () => {
+  const blob = new Blob([consoleLog.textContent || "[Empty Log]\n"], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `maicxen-flasher-log-${Date.now()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+copyDeepLinkBtn.addEventListener("click", () => {
+  if (!selectedProduct || !selectedModel) return;
+  const shareUrl = `${window.location.origin}${window.location.pathname}?product=${encodeURIComponent(selectedProduct.product_id)}&model=${encodeURIComponent(selectedModel.model_id)}`;
+  navigator.clipboard?.writeText(shareUrl).then(() => {
+    const orig = copyDeepLinkBtn.textContent;
+    copyDeepLinkBtn.textContent = "Copied ✓";
+    setTimeout(() => { copyDeepLinkBtn.textContent = orig; }, 1600);
+  });
+});
+
+// --- Init ---
 modelSelectEl.addEventListener("change", () => selectModel(modelSelectEl.value));
 document.getElementById("usbDiagBtn").addEventListener("click", usbDiag.toggleDiagnostics);
 
@@ -331,8 +556,9 @@ loadCatalog();
 if (!("serial" in navigator)) {
   setStatus(
     "warning",
-    "Mobile / Non-WebSerial Browser Detected: You can browse the MAICXEN EDGE product catalog and open the Fleet Console above. For physical USB cable flashing, open this page on desktop Chrome, Edge, or Opera."
+    "WebSerial is unavailable in this browser. You can browse firmware releases and open Fleet Console; use desktop Chrome, Edge, or Opera to flash over USB."
   );
   flashBtn.disabled = true;
+  flashLocalBinBtn.disabled = true;
   document.getElementById("usbDiagBtn").disabled = true;
 }

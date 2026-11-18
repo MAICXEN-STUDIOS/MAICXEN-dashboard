@@ -58,6 +58,30 @@ export const DEFAULT_CATALOG_PRODUCTS = [
         notes: "v1.1.1 — Added 8KB USB-CDC RX queue, 20ms TX timeout & non-blocking serial parser for Live USB Telemetry and zero-reset WebSerial FOTA."
       }
     ]
+  },
+  {
+    product_id: "onir",
+    product_name: "onIR",
+    latest_version: "1.0.0",
+    tagline: "Universal Matter-over-WiFi IR Bridge · NVS ON/OFF Profiles · Live IR Learning · Dual-Core",
+    accent: "#a855f7",
+    models: [
+      {
+        model_id: "esp32-matter",
+        model_name: "onIR Universal IR Bridge (ESP32 Matter)",
+        chip: "ESP32",
+        hw_rev: "1.0",
+        offsets: [4096, 32768, 57344, 65536],
+        latest_version: "1.0.0",
+        version_url: "./firmware/onir/esp32-matter/version.json",
+        firmware_url: "./firmware/onir/esp32-matter/firmware.bin",
+        bootloader_url: "./firmware/onir/esp32-matter/bootloader.bin",
+        partitions_url: "./firmware/onir/esp32-matter/partitions.bin",
+        boot_app0_url: "./firmware/onir/esp32-matter/boot_app0.bin",
+        capabilities: ["power", "ir_tx", "ir_rx", "ir_learn", "matter", "usb_fota", "cloud_fota", "local_web"],
+        notes: "v1.0.0 — Initial MAICXEN EDGE release: Universal Matter IR Bridge with NVS ON/OFF IR profiles, live IR remote capture, dual-core FreeRTOS architecture, Local Web UI, Pre-Matter FOTA & USB-FOTA."
+      }
+    ]
   }
 ];
 
@@ -80,16 +104,18 @@ export async function fetchPublicCatalog(sbClient, catalogJsonUrl = "./catalog.j
             product_name: row.product_name,
             latest_version: row.latest_version,
             tagline: row.description || "",
-            accent: row.product_id === "aleda" ? "#38bdf8" : "#f59e0b",
+            accent: row.product_id === "aleda" ? "#38bdf8" : row.product_id === "onir" ? "#a855f7" : "#f59e0b",
             models: []
           };
         }
         const prodVer = grouped[row.product_id].latest_version;
+        const isClassicEsp32 = String(row.chip || "").toUpperCase() === "ESP32";
         grouped[row.product_id].models.push({
           model_id: row.model_id,
           model_name: row.model_name,
           chip: row.chip,
           hw_rev: row.hw_rev,
+          offsets: isClassicEsp32 ? [4096, 32768, 57344, 65536] : [0, 32768, 69632, 131072],
           latest_version: prodVer,
           version_url: row.version_url || `./firmware/${row.product_id}/${row.model_id}/version.json`,
           firmware_url: row.firmware_url || `./firmware/${row.product_id}/${row.model_id}/firmware.bin`,

@@ -1,7 +1,7 @@
 {
   "organization": "MAICXEN EDGE",
   "domain": "iot.maicxen.it",
-  "updated_at": "2026-11-18T08:30:00Z",
+  "updated_at": "2026-11-18T08:37:06Z",
   "products": [
     {
       "product_id": "smarty",
@@ -21,8 +21,18 @@
           "bootloader_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/bootloader.bin",
           "partitions_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/partitions.bin",
           "boot_app0_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/boot_app0.bin",
-          "capabilities": ["power", "brightness", "rgb", "effects", "usb_fota", "cloud_fota", "ambient_lux", "local_web", "alexa"],
-          "notes": "v1.5.0 — Hybrid 921600-baud USB-FOTA with LED Matrix progress bar, Local Web UI & MAICXEN EDGE Cloud Fleet Sync."
+          "capabilities": [
+            "power",
+            "brightness",
+            "rgb",
+            "effects",
+            "usb_fota",
+            "cloud_fota",
+            "ambient_lux",
+            "local_web",
+            "alexa"
+          ],
+          "notes": "Rilascio v1.5.0: Procedura FOTA Nativa via USB Serial ad alta velocita (921600 baud con CRC16, barra di progresso LED 23x5 sul dispositivo e Dual-OTA Rollback Protection) con rilevamento automatico della versione e fallback automatico a esptool-js per i firmware precedenti."
         }
       ]
     },
@@ -44,7 +54,15 @@
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/bootloader.bin",
           "partitions_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/partitions.bin",
           "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-std/boot_app0.bin",
-          "capabilities": ["power", "brightness", "rgb", "effects", "cloud_fota", "local_web", "alexa"],
+          "capabilities": [
+            "power",
+            "brightness",
+            "rgb",
+            "effects",
+            "cloud_fota",
+            "local_web",
+            "alexa"
+          ],
           "notes": "v1.0.0 — MAICXEN EDGE ecosystem release for AledA Smart LED Controller."
         },
         {
@@ -58,7 +76,14 @@
           "bootloader_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/bootloader.bin",
           "partitions_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/partitions.bin",
           "boot_app0_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/boot_app0.bin",
-          "capabilities": ["power", "brightness", "rgb", "matter", "cloud_fota", "local_web"],
+          "capabilities": [
+            "power",
+            "brightness",
+            "rgb",
+            "matter",
+            "cloud_fota",
+            "local_web"
+          ],
           "notes": "v1.0.0 — Native Matter-over-WiFi 8MB Dual-OTA build for Apple HomeKit, Google Home & Alexa."
         }
       ]

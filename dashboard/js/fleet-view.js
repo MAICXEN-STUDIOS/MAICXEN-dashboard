@@ -81,7 +81,7 @@ export function renderFleet() {
   const grid = document.getElementById("devicesGrid");
   if (!filtered.length) {
     grid.innerHTML = `<div class="panel-box" style="grid-column:1/-1; text-align:center; color:var(--muted-dash);">
-      No MAICXEN EDGE devices match your current filter. Any Smarty or AledA unit will automatically appear here as soon as it connects to Wi-Fi.
+      No MAICXEN EDGE devices match your current filter. Any Smarty, AledA, or onIR unit will automatically appear here as soon as it connects to Wi-Fi.
     </div>`;
     return;
   }

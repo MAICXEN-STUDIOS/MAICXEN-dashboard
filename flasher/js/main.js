@@ -5,8 +5,11 @@ import {
   USB_FOTA_MIN_VERSION
 } from "../../shared/js/config.js";
 import { compareVersions, isVersionAtLeast, fmtDur, inferProductId } from "../../shared/js/version.js";
-import { buildStylizedPcbSvg } from "../../shared/js/pcb-visualizer.js";
-import { DEFAULT_CATALOG_PRODUCTS, fetchPublicCatalog } from "../../shared/js/catalog-data.js";
+import {
+  DEFAULT_CATALOG_PRODUCTS,
+  MaicxenProductRegistry,
+  fetchPublicCatalog
+} from "../../shared/js/catalog-data.js";
 import {
   safeClosePort,
   openAndProbeOnSamePort,
@@ -105,13 +108,21 @@ document.addEventListener("keydown", (e) => {
 
 // --- Visualizers & Logging ---
 function renderIdleBitmap(isError = false, customColor = null) {
+  if (selectedProduct && typeof selectedProduct.renderSvg === "function") {
+    pcbVisEl.innerHTML = selectedProduct.renderSvg({ progressPct: -1, isError, customColor });
+    return;
+  }
   const prodId = selectedProduct ? selectedProduct.product_id : "smarty";
-  pcbVisEl.innerHTML = buildStylizedPcbSvg(prodId, { progressPct: -1, isError, customColor });
+  pcbVisEl.innerHTML = MaicxenProductRegistry.renderIllustration(prodId, { progressPct: -1, isError, customColor });
 }
 
 function renderMatrixProgress(pct) {
+  if (selectedProduct && typeof selectedProduct.renderSvg === "function") {
+    pcbVisEl.innerHTML = selectedProduct.renderSvg({ progressPct: pct });
+    return;
+  }
   const prodId = selectedProduct ? selectedProduct.product_id : "smarty";
-  pcbVisEl.innerHTML = buildStylizedPcbSvg(prodId, { progressPct: pct });
+  pcbVisEl.innerHTML = MaicxenProductRegistry.renderIllustration(prodId, { progressPct: pct });
 }
 
 function logLine(msg) {

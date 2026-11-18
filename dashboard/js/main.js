@@ -12,7 +12,7 @@ import {
   deleteCatalogEntry,
   editCatalogEntry
 } from "./catalog-manager.js";
-import { loadEventsFromSupabase, clearEventLog } from "./activity-log.js";
+import { loadEventsFromSupabase, renderEventLogs, clearEventLog, exportEventLog } from "./activity-log.js";
 import {
   renderFleet,
   loadDevicesFromSupabase,
@@ -117,6 +117,18 @@ async function syncWithCloudAndDb() {
   await loadEventsFromSupabase();
 }
 
+function quickFilterFleet(statusVal) {
+  const devicesTab = document.querySelector(".nav-tab");
+  switchSection("devices", devicesTab);
+  const sf = document.getElementById("statusFilter");
+  if (sf) sf.value = statusVal || "all";
+  renderFleet();
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeDeviceModal();
+});
+
 // Expose DOM event handlers for declarative HTML bindings
 Object.assign(window, {
   setAuthMode,
@@ -125,6 +137,7 @@ Object.assign(window, {
   switchSection,
   switchModalTab,
   renderFleet,
+  quickFilterFleet,
   syncWithCloudAndDb,
   openDeviceModal,
   closeDeviceModal,
@@ -135,6 +148,8 @@ Object.assign(window, {
   saveCatalogEntry: () => saveCatalogEntry(renderFleet),
   deleteCatalogEntry: (id) => deleteCatalogEntry(id, renderFleet),
   editCatalogEntry,
+  renderEventLogs,
+  exportEventLog,
   clearEventLog,
   loadUsersList,
   changeUserRole,

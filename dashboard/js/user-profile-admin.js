@@ -33,7 +33,7 @@ export async function loadUsersList() {
               </div>
             </td>
             <td>
-              <select onchange="changeUserRole('${u.id}', this.value)" ${
+              <select class="apple-select" style="width:auto;min-width:110px;" onchange="changeUserRole('${u.id}', this.value)" ${
           u.id === dashboardState.currentUser.id ? "disabled" : ""
         }>
                 <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>Viewer</option>
@@ -45,18 +45,18 @@ export async function loadUsersList() {
               <span class="pill ${u.is_active ? "green" : "red"}">${u.is_active ? "Active" : "Banned"}</span>
               ${
                 !u.is_active && u.ban_reason
-                  ? `<div style="font-size:10.5px;color:var(--muted-dash);margin-top:2px;">${u.ban_reason}</div>`
+                  ? `<div style="font-size:11px;color:var(--apple-text-secondary);margin-top:3px;">${u.ban_reason}</div>`
                   : ""
               }
             </td>
-            <td>${new Date(u.created_at).toLocaleDateString("en-GB")}</td>
-            <td>
+            <td class="mono">${new Date(u.created_at).toLocaleDateString("en-GB")}</td>
+            <td style="text-align:right;">
               ${
                 u.id !== dashboardState.currentUser.id
-                  ? `<button class="${u.is_active ? "btn-danger" : "btn-primary"}" onclick="toggleUserBan('${
+                  ? `<button type="button" class="pill-btn ${u.is_active ? "danger" : "primary"}" onclick="toggleUserBan('${
                       u.id
                     }', ${u.is_active})">${u.is_active ? "Ban User" : "Unban User"}</button>`
-                  : `<span style="color:var(--muted-dash);font-size:11.5px;">Current Admin</span>`
+                  : `<span style="color:var(--apple-text-tertiary);font-size:12px;">Current Admin</span>`
               }
             </td>
           </tr>
@@ -76,8 +76,8 @@ export async function loadUsersList() {
             </td>
             <td><span class="pill cyan">${inv.role}</span></td>
             <td><span class="pill amber">Invited</span></td>
-            <td>${new Date(inv.created_at).toLocaleDateString("en-GB")}</td>
-            <td><button class="btn-danger" onclick="deleteRoleInvite('${inv.email}')">Revoke Invite</button></td>
+            <td class="mono">${new Date(inv.created_at).toLocaleDateString("en-GB")}</td>
+            <td style="text-align:right;"><button type="button" class="pill-btn danger" onclick="deleteRoleInvite('${inv.email}')">Revoke Invite</button></td>
           </tr>
         `
       )

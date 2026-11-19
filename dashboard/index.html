@@ -229,7 +229,7 @@
               <span class="row-sub">Requires same local Wi-Fi network &amp; CORS-enabled firmware</span>
             </div>
             <div class="list-row-control row-inline">
-              <input type="text" id="lanProbeIp" class="apple-input mono" placeholder="192.168.1.6" style="width:200px;" />
+              <input type="text" id="lanProbeIp" class="apple-input mono input-md" placeholder="192.168.1.6" />
               <button type="button" class="pill-btn primary" onclick="probeLocalDevice()">Probe IP</button>
             </div>
           </div>
@@ -245,8 +245,8 @@
             <h2 class="section-title">Activity Log</h2>
             <p class="section-sub">Chronological cloud audit trail of boot cycles, power state transitions, and firmware lifecycle events.</p>
           </div>
-          <div class="row-inline">
-            <input type="text" id="logSearchFilter" class="apple-input" placeholder="Filter by ID or event…" oninput="renderEventLogs()" style="width:200px;" />
+          <div class="row-inline log-actions-row">
+            <input type="text" id="logSearchFilter" class="apple-input input-md" placeholder="Filter by ID or event…" oninput="renderEventLogs()" />
             <button type="button" class="pill-btn" onclick="exportEventLog()">Export .txt</button>
             <button type="button" class="pill-btn danger role-admin" onclick="clearEventLog()">Clear Log</button>
           </div>
@@ -277,8 +277,8 @@
               <span class="row-sub">Users can register only after their email is invited here</span>
             </div>
             <div class="list-row-control row-inline">
-              <input type="email" id="inviteEmailInput" class="apple-input" placeholder="user@example.com" style="width:210px;" />
-              <div class="select-wrap" style="min-width:150px;">
+              <input type="email" id="inviteEmailInput" class="apple-input input-md" placeholder="user@example.com" />
+              <div class="select-wrap" style="min-width:140px;">
                 <select id="inviteRoleSelect" class="apple-select">
                   <option value="viewer">Viewer</option>
                   <option value="editor">Editor</option>
@@ -333,7 +333,7 @@
               </div>
             </div>
             <div class="list-row-control row-inline">
-              <input type="text" id="profileUsernameInput" class="apple-input" placeholder="Username…" style="width:180px;" />
+              <input type="text" id="profileUsernameInput" class="apple-input input-md" placeholder="Username…" />
               <button type="button" class="pill-btn primary" onclick="saveProfileUsername()">Save</button>
               <button type="button" class="pill-btn" onclick="document.getElementById('avatarFileInput').click()">Photo…</button>
               <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)" />
@@ -349,9 +349,9 @@
               <span class="row-sub">Verify your current password to set a new one</span>
             </div>
             <div class="list-row-control row-inline">
-              <input type="password" id="curPassInput" class="apple-input" placeholder="Current" style="width:135px;" />
-              <input type="password" id="newPassInput" class="apple-input" placeholder="New (6+)" minlength="6" style="width:135px;" />
-              <input type="password" id="confPassInput" class="apple-input" placeholder="Confirm" minlength="6" style="width:135px;" />
+              <input type="password" id="curPassInput" class="apple-input input-sm" placeholder="Current" />
+              <input type="password" id="newPassInput" class="apple-input input-sm" placeholder="New (6+)" minlength="6" />
+              <input type="password" id="confPassInput" class="apple-input input-sm" placeholder="Confirm" minlength="6" />
               <button type="button" class="pill-btn primary" onclick="updateMyPassword()">Update</button>
             </div>
           </div>

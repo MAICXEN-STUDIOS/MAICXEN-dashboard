@@ -308,20 +308,6 @@ MaicxenProductRegistry.register({
   renderIllustration: renderAledaSvg,
   models: [
     {
-      model_id: "esp32s3-std",
-      model_name: "AledA Standard Controller (ESP32-S3)",
-      chip: "ESP32-S3",
-      hw_rev: "1.0",
-      latest_version: "1.1.4",
-      version_url: "./firmware/aleda/esp32s3-std/version.json",
-      firmware_url: "./firmware/aleda/esp32s3-std/firmware.bin",
-      bootloader_url: "./firmware/aleda/esp32s3-std/bootloader.bin",
-      partitions_url: "./firmware/aleda/esp32s3-std/partitions.bin",
-      boot_app0_url: "./firmware/aleda/esp32s3-std/boot_app0.bin",
-      capabilities: ["power", "relays", "dimmers", "strips", "usb_fota", "cloud_fota", "local_web", "alexa"],
-      notes: "v1.1.4 — Fix AledA WebServer & telemetry OOM/starvation: remove 45KB resident Keep-Alive TLS & HTTPClient overhead, zero-fragmentation raw HTTP/1.1 POST + /api/status, and 45s non-blocking heartbeat."
-    },
-    {
       model_id: "esp32s3-matter",
       model_name: "AledA Matter over Wi-Fi Controller (ESP32-S3)",
       chip: "ESP32-S3",

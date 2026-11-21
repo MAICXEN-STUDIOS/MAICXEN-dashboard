@@ -13,7 +13,7 @@ export const SUPABASE_ANON_KEY =
  * seamless zero-bootloader-reset Native USB-FOTA mode.
  */
 export const USB_FOTA_MIN_VERSION = {
-  smarty: [1, 5, 0],
   aleda: [1, 0, 0],
+  smarty: [1, 5, 0],
   onir: [1, 0, 0]
 };

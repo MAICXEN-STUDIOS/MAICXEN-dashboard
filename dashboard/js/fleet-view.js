@@ -1,6 +1,6 @@
 import { supabase, dashboardState } from "./supabase-client.js";
-import { buildStylizedPcbSvg } from "../../shared/js/pcb-visualizer.js";
-import { fmtTs, fmtDur, fmtRelTime, inferProductId } from "../../shared/js/version.js";
+import { buildStylizedPcbSvg } from "../shared/js/pcb-visualizer.js";
+import { fmtTs, fmtDur, fmtRelTime, inferProductId } from "../shared/js/version.js";
 import { getTargetVersionForDevice } from "./catalog-manager.js";
 import { pushEventLog } from "./activity-log.js";
 
@@ -90,7 +90,7 @@ export function renderFleet() {
   const list = document.getElementById("devicesGrid");
   if (!filtered.length) {
     list.innerHTML = `<div class="fleet-empty">
-      No MAICXEN EDGE devices match your current filter. Any Smarty, AledA, or onIR unit appears automatically as soon as it connects to Wi-Fi.
+      No MAICXEN EDGE devices match your current filter. Any registered unit appears automatically as soon as it connects to Wi-Fi.
     </div>`;
     return;
   }
@@ -183,7 +183,7 @@ export function populateModal(hwId) {
 
   const flashBtn = document.getElementById("mFlashUsbBtn");
   if (flashBtn) {
-    flashBtn.href = `../?product=${encodeURIComponent(devProdSlug)}&model=${encodeURIComponent(devModel)}`;
+    flashBtn.href = `https://iot.maicxen.it/?product=${encodeURIComponent(devProdSlug)}&model=${encodeURIComponent(devModel)}`;
   }
 
   document.getElementById("mOverviewGrid").innerHTML = `

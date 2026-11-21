@@ -1,11 +1,11 @@
 /**
  * MAICXEN EDGE — Unified Product Registry, Model Variants & Minimalist Hardware Illustrations
  * Single source of truth for all MAICXEN EDGE products, hardware models, firmware metadata,
- * and Apple-style minimalist stylized SVG renders.
+ * and capability-aware Apple-style minimalist stylized SVG renders.
  */
 
 // ---------------------------------------------------------------------------
-// Minimalist Apple-Style Hardware Illustrations (Generic & Timeless)
+// Minimalist Apple-Style Hardware Illustrations (Curated + Capability-Aware)
 // ---------------------------------------------------------------------------
 
 function resolveAccent(defaultAccent, { progressPct = -1, isError = false, customColor = null, isPoweredOn = true }) {
@@ -55,13 +55,9 @@ function renderSmartySvg(opts = {}) {
           <stop offset="100%" stop-color="#111216"/>
         </linearGradient>
       </defs>
-      <!-- Outer anodized aluminum capsule -->
       <rect x="20" y="16" width="400" height="98" rx="28" fill="url(#sm-chassis)" stroke="rgba(255,255,255,0.16)" stroke-width="1.2"/>
-      <!-- Recessed diffuser glass -->
       <rect x="34" y="27" width="372" height="76" rx="19" fill="#090a0d" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-      <!-- Diffused Matrix Dots -->
       ${dots}
-      <!-- Subtle capacitive touch ring on right edge -->
       <circle cx="390" cy="65" r="5" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
     </svg>
   `;
@@ -92,16 +88,12 @@ function renderAledaSvg(opts = {}) {
           <stop offset="100%" stop-color="#101115"/>
         </linearGradient>
       </defs>
-      <!-- Minimalist architectural hub enclosure -->
       <rect x="24" y="14" width="392" height="120" rx="20" fill="url(#al-chassis)" stroke="rgba(255,255,255,0.16)" stroke-width="1.2"/>
-      <!-- Left control module / Matter hub badge -->
       <rect x="44" y="38" width="66" height="72" rx="12" fill="#0b0c10" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
       <circle cx="77" cy="64" r="11" fill="none" stroke="${accent}" stroke-width="1.4" stroke-opacity="${isPoweredOn || progressPct >= 0 ? "0.9" : "0.25"}"/>
       <circle cx="77" cy="64" r="3.5" fill="${accent}" fill-opacity="${isPoweredOn || progressPct >= 0 ? "0.95" : "0.25"}"/>
       <text x="77" y="96" fill="rgba(255,255,255,0.46)" font-size="8" font-weight="600" text-anchor="middle" letter-spacing="0.08em" font-family="-apple-system,sans-serif">HUB</text>
-      <!-- 4 Clean Channel Indicators -->
       ${channels}
-      <!-- Bottom Ambient Strip / Progress Line -->
       <rect x="128" y="102" width="268" height="6" rx="3" fill="rgba(255,255,255,0.07)"/>
       ${barWidth > 0 ? `<rect x="128" y="102" width="${barWidth}" height="6" rx="3" fill="${accent}" filter="drop-shadow(0 0 6px ${accent})"/>` : ""}
     </svg>
@@ -128,13 +120,10 @@ function renderOnIrSvg(opts = {}) {
           <stop offset="100%" stop-color="#090a0d"/>
         </radialGradient>
       </defs>
-      <!-- Minimalist rounded IR Bridge puck -->
       <rect x="116" y="20" width="128" height="104" rx="28" fill="url(#ir-puck)" stroke="rgba(255,255,255,0.16)" stroke-width="1.2"/>
-      <!-- Glossy Infrared Emitter Lens -->
       <circle cx="180" cy="72" r="28" fill="url(#ir-lens)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
       <circle cx="180" cy="72" r="9" fill="${accent}" fill-opacity="${lit ? "0.9" : "0.22"}" ${lit ? `filter="drop-shadow(0 0 10px ${accent})"` : ""}/>
       <circle cx="180" cy="72" r="3" fill="#ffffff" fill-opacity="${lit ? "0.85" : "0.18"}"/>
-      <!-- Subtle geometric IR emission arcs -->
       <path d="M266 50 A 30 30 0 0 1 266 94" fill="none" stroke="${accent}" stroke-width="2" stroke-linecap="round" opacity="${arc1Op}"/>
       <path d="M284 38 A 46 46 0 0 1 284 106" fill="none" stroke="${accent}" stroke-width="1.8" stroke-linecap="round" opacity="${arc2Op}"/>
       <path d="M302 26 A 62 62 0 0 1 302 118" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round" opacity="${arc3Op}"/>
@@ -143,12 +132,33 @@ function renderOnIrSvg(opts = {}) {
 }
 
 function renderGenericModuleSvg(opts = {}) {
-  const { progressPct = -1, isError = false, customColor = null, isPoweredOn = true, maxWidth = "440px" } = opts;
+  const {
+    progressPct = -1,
+    isError = false,
+    customColor = null,
+    isPoweredOn = true,
+    maxWidth = "440px",
+    productName = "MAICXEN EDGE",
+    chip = "ESP32-S3",
+    capabilities = []
+  } = opts;
+  const caps = Array.isArray(capabilities) ? capabilities.map((c) => String(c).toLowerCase()) : [];
+  if (caps.includes("ir_tx") || caps.includes("ir_rx")) {
+    return renderOnIrSvg(opts);
+  }
+  if (caps.includes("relays") || caps.includes("dimmers")) {
+    return renderAledaSvg(opts);
+  }
+  if (caps.includes("matrix") || (caps.includes("rgb") && caps.includes("effects"))) {
+    return renderSmartySvg(opts);
+  }
+
   const accent = resolveAccent("#0a84ff", { progressPct, isError, customColor, isPoweredOn });
   const barWidth = progressPct >= 0 ? Math.round((Math.max(0, Math.min(100, progressPct)) / 100) * 180) : isPoweredOn ? 180 : 0;
+  const subLabel = caps.length > 0 ? caps.slice(0, 3).join(" · ").toUpperCase() : `${chip} IoT Module`;
 
   return `
-    <svg viewBox="0 0 440 136" style="width:100%;max-width:${maxWidth};height:auto;display:block;" aria-label="MAICXEN EDGE Hardware">
+    <svg viewBox="0 0 440 136" style="width:100%;max-width:${maxWidth};height:auto;display:block;" aria-label="${productName} Hardware">
       <defs>
         <linearGradient id="gen-chassis" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#1d1e24"/>
@@ -158,8 +168,8 @@ function renderGenericModuleSvg(opts = {}) {
       <rect x="64" y="18" width="312" height="100" rx="22" fill="url(#gen-chassis)" stroke="rgba(255,255,255,0.16)" stroke-width="1.2"/>
       <rect x="88" y="40" width="56" height="56" rx="12" fill="#0a0b0e" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
       <circle cx="116" cy="68" r="8" fill="${accent}" fill-opacity="${isPoweredOn || progressPct >= 0 ? "0.9" : "0.2"}" ${isPoweredOn || progressPct >= 0 ? `filter="drop-shadow(0 0 8px ${accent})"` : ""}/>
-      <text x="166" y="61" fill="rgba(255,255,255,0.85)" font-size="13" font-weight="600" letter-spacing="0.02em" font-family="-apple-system,sans-serif">MAICXEN EDGE</text>
-      <text x="166" y="77" fill="rgba(255,255,255,0.42)" font-size="10" font-family="-apple-system,sans-serif">Universal IoT Module</text>
+      <text x="166" y="61" fill="rgba(255,255,255,0.85)" font-size="13" font-weight="600" letter-spacing="0.02em" font-family="-apple-system,sans-serif">${productName}</text>
+      <text x="166" y="77" fill="rgba(255,255,255,0.42)" font-size="9.5" font-family="-apple-system,sans-serif">${subLabel}</text>
       <rect x="166" y="90" width="180" height="5" rx="2.5" fill="rgba(255,255,255,0.08)"/>
       ${barWidth > 0 ? `<rect x="166" y="90" width="${barWidth}" height="5" rx="2.5" fill="${accent}"/>` : ""}
     </svg>
@@ -217,8 +227,12 @@ export class MaicxenProduct {
   }
 
   renderSvg(opts = {}) {
+    const primaryModel = this.models[0] || {};
     return this._renderIllustration({
       customColor: opts.customColor ?? this.accent,
+      productName: this.product_name,
+      chip: primaryModel.chip || "ESP32-S3",
+      capabilities: primaryModel.capabilities || [],
       ...opts
     });
   }
@@ -271,7 +285,7 @@ export class MaicxenProductRegistry {
 }
 
 // ---------------------------------------------------------------------------
-// Built-in MAICXEN EDGE Product Line Initialization
+// Built-in MAICXEN EDGE Product Line Initialization (Auto-Synced by Ecosystem)
 // ---------------------------------------------------------------------------
 
 MaicxenProductRegistry.register({

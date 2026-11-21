@@ -3,7 +3,7 @@
   "domain": "iot.maicxen.it",
   "flasher_version": "2.4.0",
   "dashboard_version": "3.2.0",
-  "updated_at": "2026-11-18T22:16:56Z",
+  "updated_at": "2026-11-21T11:25:25Z",
   "products": [
     {
       "product_id": "smarty",
@@ -18,6 +18,12 @@
           "model_name": "Smarty 23×5 RGB Matrix (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
+          "offsets": [
+            0,
+            32768,
+            69632,
+            131072
+          ],
           "latest_version": "1.6.1",
           "version_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/smarty/esp32s3-std/firmware.bin",
@@ -52,6 +58,12 @@
           "model_name": "AledA Matter over Wi-Fi Controller (ESP32-S3)",
           "chip": "ESP32-S3",
           "hw_rev": "1.0",
+          "offsets": [
+            0,
+            32768,
+            69632,
+            131072
+          ],
           "latest_version": "1.1.4",
           "version_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/version.json",
           "firmware_url": "https://iot.maicxen.it/firmware/aleda/esp32s3-matter/firmware.bin",

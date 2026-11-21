@@ -1,5 +1,5 @@
 import { supabase, dashboardState } from "./supabase-client.js";
-import { inferProductId } from "../../shared/js/version.js";
+import { inferProductId } from "../shared/js/version.js";
 
 export function getTargetVersionForDevice(dev) {
   const prodId = inferProductId(dev);
@@ -97,7 +97,7 @@ export async function loadProductCatalog(onAfterRender) {
               </td>
               <td style="text-align:right;">
                 <div class="row-inline" style="justify-content:flex-end;">
-                  <a href="../?product=${encodeURIComponent(row.product_id)}&model=${encodeURIComponent(
+                  <a href="https://iot.maicxen.it/?product=${encodeURIComponent(row.product_id)}&model=${encodeURIComponent(
             row.model_id
           )}" class="pill-btn">Flash ↗</a>
                   ${

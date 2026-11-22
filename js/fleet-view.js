@@ -107,13 +107,21 @@ export function renderFleet() {
         ? `Up to date (v${d.fw || "--"})`
         : `Update available: v${targetVer}`;
 
+      const emblemUrl = `./shared/assets/emblems/edge-${devProd.toLowerCase()}-${devModel.toLowerCase()}-emblem.webp`;
       return `
         <div class="device-row ${isOnline ? "online" : "offline"}" onclick="openDeviceModal('${d.hw_id}')">
           <div class="device-thumb">
-            ${buildStylizedPcbSvg(devProd.toLowerCase(), {
-              isPoweredOn: Boolean(d.power),
-              maxWidth: "74px"
-            })}
+            <img
+              src="${emblemUrl}"
+              alt="${devProd} ${devModel}"
+              width="52"
+              height="52"
+              style="width:52px;height:52px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,0.12);${d.power ? "" : "opacity:0.55;filter:grayscale(0.5);"}"
+              onerror="this.replaceWith(document.createRange().createContextualFragment(\`${buildStylizedPcbSvg(devProd.toLowerCase(), {
+                isPoweredOn: Boolean(d.power),
+                maxWidth: "74px"
+              }).replace(/`/g, "\\`")}\`))"
+            />
           </div>
 
           <div class="device-identity">

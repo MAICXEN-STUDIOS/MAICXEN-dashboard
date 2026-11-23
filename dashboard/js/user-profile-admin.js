@@ -177,19 +177,96 @@ export async function deleteRoleInvite(email) {
 }
 
 export async function saveProfileUsername() {
-  const uname = document.getElementById("profileUsernameInput").value.trim();
-  if (!uname || !dashboardState.currentUser) return;
+  const fullNameEl = document.getElementById("profileFullNameInput");
+  const unameEl = document.getElementById("profileUsernameInput");
+  const jobEl = document.getElementById("profileJobTitleInput");
+  const phoneEl = document.getElementById("profilePhoneInput");
+
+  const uname = (unameEl?.value || "").trim();
+  const fullName = (fullNameEl?.value || uname).trim();
+  const jobTitle = (jobEl?.value || "").trim();
+  const phone = (phoneEl?.value || "").trim();
+
+  if (!uname || !fullName || !dashboardState.currentUser) {
+    alert("Full Name and Username are required.");
+    return;
+  }
+
   const { error } = await supabase
     .from("user_profiles")
-    .update({ username: uname, full_name: uname, updated_at: new Date().toISOString() })
+    .update({ username: uname, full_name: fullName, updated_at: new Date().toISOString() })
     .eq("id", dashboardState.currentUser.id);
   if (error) {
-    alert("Error saving username: " + error.message);
-  } else {
-    dashboardState.currentProfile.username = uname;
-    applyRolePermissionsUI();
-    alert("Username updated!");
+    alert("Error saving profile: " + error.message);
+    return;
   }
+
+  await supabase.auth.updateUser({
+    data: { username: uname, full_name: fullName, job_title: jobTitle, phone }
+  });
+
+  dashboardState.currentProfile.username = uname;
+  dashboardState.currentProfile.full_name = fullName;
+  applyRolePermissionsUI();
+  alert("Profile details updated and synced!");
+}
+
+export async function removeMyAvatar() {
+  if (!dashboardState.currentUser) return;
+  const { error } = await supabase
+    .from("user_profiles")
+    .update({ avatar_url: "", updated_at: new Date().toISOString() })
+    .eq("id", dashboardState.currentUser.id);
+  if (error) {
+    alert("Error removing photo: " + error.message);
+  } else {
+    dashboardState.currentProfile.avatar_url = "";
+    applyRolePermissionsUI();
+  }
+}
+
+export async function updateMyEmail() {
+  const newEmail = (document.getElementById("newEmailInput")?.value || "").trim().toLowerCase();
+  const curPass = document.getElementById("emailCurPassInput")?.value || "";
+  if (!newEmail || !dashboardState.currentProfile) {
+    alert("Please enter a valid new email address.");
+    return;
+  }
+  if (newEmail === dashboardState.currentProfile.email.toLowerCase()) {
+    alert("The new email matches your current email.");
+    return;
+  }
+  if (!curPass) {
+    alert("Current password is required to request an email change.");
+    return;
+  }
+
+  const { error: verifyErr } = await supabase.auth.signInWithPassword({
+    email: dashboardState.currentProfile.email,
+    password: curPass
+  });
+  if (verifyErr) {
+    alert("Verification failed: current password is incorrect.");
+    return;
+  }
+
+  const { error } = await supabase.auth.updateUser(
+    { email: newEmail },
+    { emailRedirectTo: window.location.href }
+  );
+  if (error) {
+    alert("Error requesting email change: " + error.message);
+  } else {
+    document.getElementById("newEmailInput").value = "";
+    document.getElementById("emailCurPassInput").value = "";
+    alert(`Confirmation email sent to ${newEmail}. Click the verification link to complete the change.`);
+  }
+}
+
+export async function logoutAllDevices() {
+  if (!confirm("Sign out from ALL active sessions across MAICXEN portals?")) return;
+  await supabase.auth.signOut({ scope: "global" });
+  location.reload();
 }
 
 async function resizeImageToBlob(file, maxDim = 256) {

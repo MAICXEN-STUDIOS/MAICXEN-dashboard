@@ -3,7 +3,8 @@ import { applyRolePermissionsUI } from "./auth-rbac.js";
 import { renderFleet, upsertDeviceToSupabase } from "./fleet-view.js";
 
 export async function loadUsersList() {
-  if (dashboardState.currentProfile?.role !== "admin") return;
+  const myRole = dashboardState.currentProfile?.role || "viewer";
+  if (myRole !== "admin" && myRole !== "owner") return;
   const { data: users } = await supabase.from("user_profiles").select("*").order("created_at", { ascending: true });
   const { data: invites } = await supabase
     .from("role_invites")
@@ -21,6 +22,9 @@ export async function loadUsersList() {
         const avHtml = u.avatar_url
           ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;" />`
           : initial;
+        const isSelf = u.id === dashboardState.currentUser.id;
+        const isProtectedOwner = u.role === "owner" && myRole !== "owner";
+        const locked = isSelf || isProtectedOwner;
         return `
           <tr>
             <td>
@@ -33,16 +37,22 @@ export async function loadUsersList() {
               </div>
             </td>
             <td>
-              <select class="apple-select" style="width:auto;min-width:110px;" onchange="changeUserRole('${u.id}', this.value)" ${
-          u.id === dashboardState.currentUser.id ? "disabled" : ""
+              <select class="apple-select" style="width:auto;min-width:120px;" onchange="changeUserRole('${u.id}', this.value)" ${
+          locked ? "disabled" : ""
         }>
-                <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>Viewer</option>
-                <option value="editor" ${u.role === "editor" ? "selected" : ""}>Editor</option>
-                <option value="admin" ${u.role === "admin" ? "selected" : ""}>Admin</option>
+                <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>Viewer (L1)</option>
+                <option value="editor" ${u.role === "editor" ? "selected" : ""}>Editor (L2)</option>
+                <option value="manager" ${u.role === "manager" ? "selected" : ""}>Manager (L3)</option>
+                <option value="admin" ${u.role === "admin" ? "selected" : ""}>Admin (L4)</option>
+                ${
+                  u.role === "owner" || myRole === "owner"
+                    ? `<option value="owner" ${u.role === "owner" ? "selected" : ""}>Owner (L5)</option>`
+                    : ""
+                }
               </select>
             </td>
             <td>
-              <span class="pill ${u.is_active ? "green" : "red"}">${u.is_active ? "Active" : "Banned"}</span>
+              <span class="pill ${u.is_active ? "green" : "red"}">${u.is_active ? "Active" : "Suspended"}</span>
               ${
                 !u.is_active && u.ban_reason
                   ? `<div style="font-size:11px;color:var(--apple-text-secondary);margin-top:3px;">${u.ban_reason}</div>`
@@ -52,11 +62,11 @@ export async function loadUsersList() {
             <td class="mono">${new Date(u.created_at).toLocaleDateString("en-GB")}</td>
             <td style="text-align:right;">
               ${
-                u.id !== dashboardState.currentUser.id
+                !locked
                   ? `<button type="button" class="pill-btn ${u.is_active ? "danger" : "primary"}" onclick="toggleUserBan('${
                       u.id
-                    }', ${u.is_active})">${u.is_active ? "Ban User" : "Unban User"}</button>`
-                  : `<span style="color:var(--apple-text-tertiary);font-size:12px;">Current Admin</span>`
+                    }', ${u.is_active})">${u.is_active ? "Suspend" : "Reactivate"}</button>`
+                  : `<span style="color:var(--apple-text-tertiary);font-size:12px;">${isSelf ? "Current Session" : "Protected Owner"}</span>`
               }
             </td>
           </tr>
@@ -67,20 +77,29 @@ export async function loadUsersList() {
 
   if (invites && invites.length > 0) {
     html += invites
-      .map(
-        (inv) => `
+      .map((inv) => {
+        const expired = inv.expires_at && new Date(inv.expires_at) < new Date();
+        const inviteUrl = `${window.location.origin}${window.location.pathname}?mode=signup&email=${encodeURIComponent(inv.email)}`;
+        return `
           <tr>
             <td>
               <strong>${inv.email}</strong><br>
-              <span style="color:var(--amber);font-size:11px;">Pre-authorized (Pending user registration)</span>
+              <span style="color:${expired ? "var(--red)" : "var(--amber)"};font-size:11px;">${
+                expired ? "Invite Expired" : "Pre-authorized (Pending user registration)"
+              }${inv.console_enabled ? ` · Console: ${(inv.console_divisions || []).join(", ") || "enabled"}` : ""}</span>
             </td>
             <td><span class="pill cyan">${inv.role}</span></td>
-            <td><span class="pill amber">Invited</span></td>
+            <td><span class="pill ${expired ? "red" : "amber"}">${expired ? "Expired" : "Invited"}</span></td>
             <td class="mono">${new Date(inv.created_at).toLocaleDateString("en-GB")}</td>
-            <td style="text-align:right;"><button type="button" class="pill-btn danger" onclick="deleteRoleInvite('${inv.email}')">Revoke Invite</button></td>
+            <td style="text-align:right;">
+              <div style="display:inline-flex;gap:6px;">
+                <button type="button" class="pill-btn" onclick="navigator.clipboard.writeText('${inviteUrl}');alert('Registration link copied for ${inv.email}')">Copy Link</button>
+                <button type="button" class="pill-btn danger" onclick="deleteRoleInvite('${inv.email}')">Revoke</button>
+              </div>
+            </td>
           </tr>
-        `
-      )
+        `;
+      })
       .join("");
   }
 
@@ -129,12 +148,23 @@ export async function assignRoleByEmail() {
   if (existing && existing.id) {
     await changeUserRole(existing.id, role);
   } else {
-    const { error } = await supabase.from("role_invites").upsert({
+    const expiresAt = new Date(Date.now() + 14 * 86400 * 1000).toISOString();
+    let { error } = await supabase.from("role_invites").upsert({
       email,
       role,
+      expires_at: expiresAt,
       accepted_at: null,
       invited_by: dashboardState.currentUser.id
     });
+    if (error && error.message.includes("column")) {
+      const retry = await supabase.from("role_invites").upsert({
+        email,
+        role: role === "manager" ? "editor" : role,
+        accepted_at: null,
+        invited_by: dashboardState.currentUser.id
+      });
+      error = retry.error;
+    }
     if (error) alert("Error: " + error.message);
   }
   document.getElementById("inviteEmailInput").value = "";

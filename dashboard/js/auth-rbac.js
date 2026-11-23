@@ -68,12 +68,13 @@ export function setAuthMode(mode, btnEl = null) {
 export function applyRolePermissionsUI() {
   const profile = dashboardState.currentProfile;
   const role = profile?.role || "viewer";
-  const isEditorOrAdmin = role === "editor" || role === "admin";
-  const isAdmin = role === "admin";
+  const isOwner = role === "owner";
+  const isAdmin = isOwner || role === "admin";
+  const isEditorOrAdmin = isAdmin || role === "manager" || role === "editor";
 
   const badge = document.getElementById("userRoleBadge");
   badge.textContent = role.toUpperCase();
-  badge.className = "pill " + (isAdmin ? "purple" : isEditorOrAdmin ? "cyan" : "amber");
+  badge.className = "pill " + (isOwner ? "green" : isAdmin ? "purple" : isEditorOrAdmin ? "cyan" : "amber");
 
   const displayName =
     profile?.username || profile?.full_name || profile?.email.split("@")[0] || "User";

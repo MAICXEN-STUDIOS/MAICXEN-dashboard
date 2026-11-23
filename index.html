@@ -324,7 +324,10 @@
             <h2 class="section-title">Account &amp; Settings</h2>
             <p class="section-sub" id="profileEmailInfo">--</p>
           </div>
-          <button type="button" class="pill-btn danger" onclick="logoutUser()">Sign Out</button>
+          <div class="row-inline">
+            <button type="button" class="pill-btn" onclick="logoutAllDevices()">Sign Out All Devices</button>
+            <button type="button" class="pill-btn danger" onclick="logoutUser()">Sign Out</button>
+          </div>
         </div>
 
         <div class="group-caption">Profile &amp; Avatar</div>
@@ -333,30 +336,53 @@
             <div class="row-inline" style="gap:16px;">
               <div class="avatar-img lg" id="profileAvatarPreview">U</div>
               <div class="list-row-label">
-                <span class="row-title">Display Name &amp; Photo</span>
-                <span class="row-sub">Synced across your MAICXEN EDGE sessions</span>
+                <span class="row-title">Profile Photo</span>
+                <span class="row-sub">Synced across MAICXEN Console, IoT Dashboard &amp; Web Flasher</span>
               </div>
             </div>
             <div class="list-row-control row-inline">
-              <input type="text" id="profileUsernameInput" class="apple-input input-md" placeholder="Username…" />
-              <button type="button" class="pill-btn primary" onclick="saveProfileUsername()">Save</button>
-              <button type="button" class="pill-btn" onclick="document.getElementById('avatarFileInput').click()">Photo…</button>
+              <button type="button" class="pill-btn" onclick="document.getElementById('avatarFileInput').click()">Upload Photo…</button>
+              <button type="button" class="pill-btn danger" onclick="removeMyAvatar()">Remove</button>
               <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)" />
+            </div>
+          </div>
+          <div class="list-row">
+            <div class="list-row-label">
+              <span class="row-title">Identity Details</span>
+              <span class="row-sub">Full Name &amp; Username are required</span>
+            </div>
+            <div class="list-row-control row-inline">
+              <input type="text" id="profileFullNameInput" class="apple-input input-sm" placeholder="Full Name *" />
+              <input type="text" id="profileUsernameInput" class="apple-input input-sm" placeholder="Username *" />
+              <input type="text" id="profileJobTitleInput" class="apple-input input-sm" placeholder="Job Title" />
+              <input type="text" id="profilePhoneInput" class="apple-input input-sm" placeholder="Phone" />
+              <button type="button" class="pill-btn primary" onclick="saveProfileUsername()">Save</button>
             </div>
           </div>
         </div>
 
-        <div class="group-caption">Security</div>
+        <div class="group-caption">Security (Verification Required)</div>
         <div class="list-group" style="margin-bottom:28px;">
           <div class="list-row">
             <div class="list-row-label">
-              <span class="row-title">Change Password</span>
-              <span class="row-sub">Verify your current password to set a new one</span>
+              <span class="row-title">Change Email Address</span>
+              <span class="row-sub">Requires current password &amp; confirmation link sent to new email</span>
             </div>
             <div class="list-row-control row-inline">
-              <input type="password" id="curPassInput" class="apple-input input-sm" placeholder="Current" />
-              <input type="password" id="newPassInput" class="apple-input input-sm" placeholder="New (6+)" minlength="6" />
-              <input type="password" id="confPassInput" class="apple-input input-sm" placeholder="Confirm" minlength="6" />
+              <input type="email" id="newEmailInput" class="apple-input input-md" placeholder="new.email@maicxen.it" />
+              <input type="password" id="emailCurPassInput" class="apple-input input-sm" placeholder="Current Pass *" />
+              <button type="button" class="pill-btn primary" onclick="updateMyEmail()">Request Change</button>
+            </div>
+          </div>
+          <div class="list-row">
+            <div class="list-row-label">
+              <span class="row-title">Change Password</span>
+              <span class="row-sub">Verify your current password to set a new one (min. 8 characters)</span>
+            </div>
+            <div class="list-row-control row-inline">
+              <input type="password" id="curPassInput" class="apple-input input-sm" placeholder="Current *" />
+              <input type="password" id="newPassInput" class="apple-input input-sm" placeholder="New (8+) *" minlength="8" />
+              <input type="password" id="confPassInput" class="apple-input input-sm" placeholder="Confirm *" minlength="8" />
               <button type="button" class="pill-btn primary" onclick="updateMyPassword()">Update</button>
             </div>
           </div>

@@ -79,7 +79,14 @@ export function applyRolePermissionsUI() {
   const displayName =
     profile?.username || profile?.full_name || profile?.email.split("@")[0] || "User";
   document.getElementById("navUsername").textContent = displayName;
-  document.getElementById("profileUsernameInput").value = displayName;
+  const fullEl = document.getElementById("profileFullNameInput");
+  if (fullEl) fullEl.value = profile?.full_name || displayName;
+  document.getElementById("profileUsernameInput").value = profile?.username || displayName;
+  const meta = dashboardState.currentUser?.user_metadata || {};
+  const jobEl = document.getElementById("profileJobTitleInput");
+  if (jobEl) jobEl.value = meta.job_title || "";
+  const phoneEl = document.getElementById("profilePhoneInput");
+  if (phoneEl) phoneEl.value = meta.phone || "";
   document.getElementById("profileEmailInfo").textContent = `${profile?.email} • Role: ${role.toUpperCase()}`;
 
   renderAvatarElement(document.getElementById("navAvatarBox"), profile);

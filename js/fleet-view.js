@@ -4,6 +4,8 @@ import { getTargetVersionForDevice } from "./catalog-manager.js";
 import { pushEventLog } from "./activity-log.js";
 
 export async function upsertDeviceToSupabase(dev) {
+  const role = dashboardState.currentProfile?.role || "viewer";
+  if (!["owner", "admin", "manager", "editor"].includes(role)) return;
   const inferredProd = inferProductId(dev);
   await supabase.from("smarty_devices").upsert({
     hw_id: dev.hw_id,
@@ -192,8 +194,12 @@ export function populateModal(hwId) {
   pill.textContent = isOnline ? "ONLINE" : "OFFLINE";
   pill.className = "pill " + (isOnline ? "green" : "amber");
 
+  const isEditorOrAdmin = ["owner", "admin", "manager", "editor"].includes(
+    dashboardState.currentProfile?.role || "viewer"
+  );
+
   const localBtn = document.getElementById("mLocalUiBtn");
-  if (d.wifi_ip && d.wifi_ip !== "0.0.0.0") {
+  if (isEditorOrAdmin && d.wifi_ip && d.wifi_ip !== "0.0.0.0") {
     localBtn.href = `http://${d.wifi_ip}`;
     localBtn.style.display = "inline-flex";
     localBtn.textContent = `Open Local UI (${d.wifi_ip}) ↗`;
@@ -236,7 +242,9 @@ export function populateModal(hwId) {
   } boots)</strong></div>
     <div class="kv-row"><span>Local IPv4</span><strong class="mono">${
       d.wifi_ip && d.wifi_ip !== "0.0.0.0"
-        ? `<a href="http://${d.wifi_ip}" target="_blank" rel="noopener">http://${d.wifi_ip} ↗</a>`
+        ? isEditorOrAdmin
+          ? `<a href="http://${d.wifi_ip}" target="_blank" rel="noopener">http://${d.wifi_ip} ↗</a>`
+          : d.wifi_ip
         : "--"
     }</strong></div>
     <div class="kv-row"><span>Heap (Free / Min)</span><strong class="mono">${Math.round(
@@ -262,7 +270,11 @@ export function populateModal(hwId) {
   `;
 
   updateFotaButtonsUi(d, targetVer, isUpToDate, false);
-  checkPendingFotaCommand(hwId, targetVer, isUpToDate);
+  if (isEditorOrAdmin) {
+    checkPendingFotaCommand(hwId, targetVer, isUpToDate);
+  } else {
+    setFotaFeedback("");
+  }
 }
 
 function setFotaFeedback(msg, tone = "") {
@@ -442,6 +454,8 @@ export function ingestTelemetryPacket(pkt, serverTimestampSec = null, persistToD
 }
 
 export async function probeLocalDevice(openModalFn) {
+  const role = dashboardState.currentProfile?.role || "viewer";
+  if (!["owner", "admin", "manager", "editor"].includes(role)) return;
   const ip = document
     .getElementById("lanProbeIp")
     .value.trim()

@@ -2,7 +2,7 @@
   "product_id": "onir",
   "product_name": "onIR",
   "model_id": "esp32-matter",
-  "model_name": "onIR Universal IR Bridge (ESP32 Matter)",
+  "model_name": "onIR Universal Smart Home IR Bridge",
   "chip": "ESP32",
   "hw_rev": "1.0",
   "offsets": [

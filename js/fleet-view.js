@@ -260,6 +260,126 @@ export function populateModal(hwId) {
     }</strong></div>
     <div class="kv-row"><span>MAC Address</span><strong class="mono">${d.mac || "--"}</strong></div>
   `;
+
+  updateFotaButtonsUi(d, targetVer, isUpToDate, false);
+  checkPendingFotaCommand(hwId, targetVer, isUpToDate);
+}
+
+function setFotaFeedback(msg, tone = "") {
+  const el = document.getElementById("mFotaFeedback");
+  if (!el) return;
+  if (!msg) {
+    el.className = "fota-feedback";
+    el.textContent = "";
+    return;
+  }
+  el.className = `fota-feedback show ${tone}`.trim();
+  el.textContent = msg;
+}
+
+function updateFotaButtonsUi(d, targetVer, isUpToDate, hasPending) {
+  const role = dashboardState.currentProfile?.role || "viewer";
+  const canCommand = ["owner", "admin", "manager", "editor"].includes(role);
+  const btn = document.getElementById("mForceFotaBtn");
+  const sysBtn = document.getElementById("mSysForceFotaBtn");
+
+  if (btn) {
+    btn.disabled = !canCommand || hasPending;
+    btn.textContent = hasPending
+      ? "FOTA Update Queued…"
+      : isUpToDate
+        ? `Force FOTA Check (v${targetVer})`
+        : `Force Update → v${targetVer}`;
+  }
+  if (sysBtn) {
+    sysBtn.disabled = !canCommand || hasPending;
+    sysBtn.textContent = hasPending ? "FOTA Queued…" : `Force Remote FOTA (v${targetVer})`;
+  }
+}
+
+async function checkPendingFotaCommand(hwId, targetVer, isUpToDate) {
+  setFotaFeedback("");
+  try {
+    const { data, error } = await supabase
+      .from("device_commands")
+      .select("id, cmd, created_at")
+      .eq("hw_id", hwId)
+      .eq("executed", false)
+      .order("id", { ascending: false })
+      .limit(5);
+
+    if (error || !data || dashboardState.selectedHwId !== hwId) return;
+    const pendingFota = data.find((row) => row.cmd && row.cmd.action === "fota_update");
+    if (pendingFota) {
+      const d = dashboardState.fleetRegistry[hwId];
+      if (d) updateFotaButtonsUi(d, targetVer, isUpToDate, true);
+      const ts = pendingFota.created_at
+        ? new Date(pendingFota.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+        : "";
+      setFotaFeedback(
+        `Remote FOTA command queued${ts ? ` at ${ts}` : ""} — waiting for the device's next cloud heartbeat (~45–60s).`,
+        "queued"
+      );
+    }
+  } catch (_) {
+    // Non-blocking UI hint
+  }
+}
+
+export async function triggerRemoteFota() {
+  const hwId = dashboardState.selectedHwId;
+  const d = hwId ? dashboardState.fleetRegistry[hwId] : null;
+  if (!hwId || !d) return;
+
+  const role = dashboardState.currentProfile?.role || "viewer";
+  if (!["owner", "admin", "manager", "editor"].includes(role)) {
+    setFotaFeedback("Insufficient permissions: Editor, Manager, Admin, or Owner role required.", "err");
+    return;
+  }
+
+  const targetVer = getTargetVersionForDevice(d);
+  const isUpToDate = d.fw === targetVer;
+  const label = d.alias || hwId;
+  const promptMsg = isUpToDate
+    ? `Send a remote FOTA check command to "${label}"?\n\nCurrent FW: v${d.fw || "--"} · Latest release: v${targetVer}.\nThe device will check for updates on its next cloud heartbeat (~45–60s).`
+    : `Force remote FOTA update on "${label}"?\n\nCurrent FW: v${d.fw || "--"} → Target FW: v${targetVer}.\nThe device will download, verify, flash over Wi-Fi, and reboot automatically on its next cloud heartbeat (~45–60s).`;
+
+  if (!confirm(promptMsg)) return;
+
+  const btn = document.getElementById("mForceFotaBtn");
+  const sysBtn = document.getElementById("mSysForceFotaBtn");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Queueing FOTA…";
+  }
+  if (sysBtn) {
+    sysBtn.disabled = true;
+  }
+
+  const actor = dashboardState.currentProfile?.email || dashboardState.currentUser?.email || "dashboard";
+  const { error } = await supabase.from("device_commands").insert({
+    hw_id: hwId,
+    cmd: {
+      action: "fota_update",
+      force: true,
+      target_version: targetVer,
+      requested_at: new Date().toISOString()
+    },
+    created_by: actor
+  });
+
+  if (error) {
+    updateFotaButtonsUi(d, targetVer, isUpToDate, false);
+    setFotaFeedback(`Failed to queue FOTA command: ${error.message}`, "err");
+    return;
+  }
+
+  updateFotaButtonsUi(d, targetVer, isUpToDate, true);
+  setFotaFeedback(
+    `FOTA command queued for ${label} (target v${targetVer}). The device will pick it up on its next heartbeat (~45–60s) and reboot if an update is installed.`,
+    "ok"
+  );
+  pushEventLog(hwId, "FOTA_QUEUED", `Remote FOTA triggered by ${actor} (v${d.fw || "--"} → v${targetVer})`);
 }
 
 export async function loadDevicesFromSupabase() {
@@ -382,7 +502,7 @@ export async function renameCurrentDevice() {
 
 export async function removeCurrentDevice(closeModalFn) {
   const hwId = dashboardState.selectedHwId;
-  if (!hwId || dashboardState.currentProfile?.role !== "admin") return;
+  if (!hwId || !["owner", "admin"].includes(dashboardState.currentProfile?.role)) return;
   if (!confirm(`Remove ${hwId} from the Supabase fleet registry?`)) return;
   await supabase.from("smarty_devices").delete().eq("hw_id", hwId);
   delete dashboardState.fleetRegistry[hwId];

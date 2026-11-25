@@ -1,5 +1,4 @@
 import { supabase, dashboardState } from "./supabase-client.js";
-import { buildStylizedPcbSvg } from "../shared/js/pcb-visualizer.js";
 import { fmtTs, fmtDur, fmtRelTime, inferProductId } from "../shared/js/version.js";
 import { getTargetVersionForDevice } from "./catalog-manager.js";
 import { pushEventLog } from "./activity-log.js";
@@ -116,11 +115,8 @@ export function renderFleet() {
               alt="${devProd} ${devModel}"
               width="52"
               height="52"
-              style="width:52px;height:52px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,0.12);${d.power ? "" : "opacity:0.55;filter:grayscale(0.5);"}"
-              onerror="this.replaceWith(document.createRange().createContextualFragment(\`${buildStylizedPcbSvg(devProd.toLowerCase(), {
-                isPoweredOn: Boolean(d.power),
-                maxWidth: "74px"
-              }).replace(/`/g, "\\`")}\`))"
+              style="width:52px;height:52px;border-radius:12px;object-fit:contain;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.14);padding:3px;${d.power ? "" : "opacity:0.55;filter:grayscale(0.45);"}"
+              onerror="this.style.visibility='hidden'"
             />
           </div>
 
@@ -177,10 +173,20 @@ export function populateModal(hwId) {
   document.getElementById("mSubtitle").textContent = `${devProd} · ${devModel} (Rev ${
     d.hw_rev || "1.0"
   }) · ${d.hw_id}`;
-  document.getElementById("mPcbPreview").innerHTML = buildStylizedPcbSvg(devProdSlug, {
-    isPoweredOn: Boolean(d.power),
-    maxWidth: "380px"
-  });
+  document.getElementById("mPcbPreview").innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;padding:12px 0;">
+      <div style="width:128px;height:128px;border-radius:26px;padding:12px;background:rgba(12,14,20,0.92);border:1px solid rgba(255,255,255,0.14);box-shadow:0 16px 40px rgba(0,0,0,0.65),0 0 36px ${d.power ? "rgba(0,255,195,0.22)" : "rgba(255,255,255,0.06)"};display:flex;align-items:center;justify-content:center;">
+        <img
+          src="${modalEmblemUrl}"
+          alt="${devProd} emblem"
+          width="104"
+          height="104"
+          style="width:100%;height:100%;object-fit:contain;border-radius:16px;${d.power ? "" : "opacity:0.55;filter:grayscale(0.4);"}"
+          onerror="this.style.visibility='hidden'"
+        />
+      </div>
+    </div>
+  `;
 
   const pill = document.getElementById("mOnlinePill");
   pill.textContent = isOnline ? "ONLINE" : "OFFLINE";

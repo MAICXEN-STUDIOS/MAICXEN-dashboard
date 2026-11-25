@@ -167,7 +167,13 @@ export function populateModal(hwId) {
   const devProd = devProdSlug.toUpperCase();
   const devModel = d.model_id || "esp32s3-std";
 
-  document.getElementById("mTitle").textContent = d.alias || d.hw_id;
+  const modalEmblemUrl = `./shared/assets/emblems/edge-${devProdSlug}-${devModel.toLowerCase()}-emblem.webp`;
+  document.getElementById("mTitle").innerHTML = `
+    <span style="display:inline-flex;align-items:center;gap:10px;">
+      <img src="${modalEmblemUrl}" alt="${devProd} emblem" width="32" height="32" style="width:32px;height:32px;border-radius:8px;object-fit:contain;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.14);padding:2px;" onerror="this.style.display='none'" />
+      <span>${d.alias || d.hw_id}</span>
+    </span>
+  `;
   document.getElementById("mSubtitle").textContent = `${devProd} · ${devModel} (Rev ${
     d.hw_rev || "1.0"
   }) · ${d.hw_id}`;

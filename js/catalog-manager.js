@@ -37,19 +37,25 @@ export async function loadProductCatalog(onAfterRender) {
     .select("*")
     .order("product_id", { ascending: true });
 
-  // Merge live catalog.json (always synced with compiled firmware releases & emblems) over Supabase rows
-  let catalogRows = Array.isArray(sbRows) ? [...sbRows] : [];
+  const sbByKey = new Map(
+    (Array.isArray(sbRows) ? sbRows : []).map((r) => [`${r.product_id}::${r.model_id}`, r])
+  );
+
+  // Use live catalog.json (auto-generated from deployed ready_for_firmware products & compiled releases)
+  // as the authoritative source of truth so Dashboard & Flasher are ALWAYS 100% synchronized.
+  let catalogRows = [];
+  let loadedFromJson = false;
   try {
     const res = await fetch(`./catalog.json?cb=${Date.now()}`, { cache: "no-store" });
     if (res.ok) {
       const cat = await res.json();
       if (Array.isArray(cat.products) && cat.products.length > 0) {
-        const byKey = new Map(catalogRows.map((r) => [`${r.product_id}::${r.model_id}`, r]));
+        loadedFromJson = true;
         cat.products.forEach((prod) => {
           (prod.models || []).forEach((m) => {
             const key = `${prod.product_id}::${m.model_id}`;
-            const prev = byKey.get(key) || {};
-            byKey.set(key, {
+            const prev = sbByKey.get(key) || {};
+            catalogRows.push({
               ...prev,
               product_id: prod.product_id,
               product_name: prod.product_name,
@@ -59,19 +65,61 @@ export async function loadProductCatalog(onAfterRender) {
               hw_rev: m.hw_rev || prev.hw_rev || "1.0",
               emblem: m.emblem || prod.emblem || `./shared/assets/emblems/edge-${prod.product_id}-${m.model_id}-emblem.webp`,
               latest_version: m.latest_version || prod.latest_version || prev.latest_version || "1.0.0",
+              version_url: m.version_url || `https://iot.maicxen.it/firmware/${prod.product_id}/${m.model_id}/version.json`,
+              firmware_url: m.firmware_url || `https://iot.maicxen.it/firmware/${prod.product_id}/${m.model_id}/firmware.bin`,
+              bootloader_url: m.bootloader_url || `https://iot.maicxen.it/firmware/${prod.product_id}/${m.model_id}/bootloader.bin`,
+              partitions_url: m.partitions_url || `https://iot.maicxen.it/firmware/${prod.product_id}/${m.model_id}/partitions.bin`,
+              boot_app0_url: m.boot_app0_url || `https://iot.maicxen.it/firmware/${prod.product_id}/${m.model_id}/boot_app0.bin`,
               capabilities: Array.isArray(m.capabilities) && m.capabilities.length ? m.capabilities : (prev.capabilities || []),
               release_notes: m.notes || prev.release_notes || prev.description || "",
               description: m.notes || prev.description || ""
             });
           });
         });
-        catalogRows = Array.from(byKey.values()).sort((a, b) =>
-          String(a.product_id).localeCompare(String(b.product_id))
-        );
+        catalogRows.sort((a, b) => String(a.product_id).localeCompare(String(b.product_id)));
       }
     }
   } catch {
-    // Keep Supabase rows if catalog.json fetch fails
+    // Fallback to Supabase rows below
+  }
+
+  if (!loadedFromJson) {
+    catalogRows = Array.isArray(sbRows) ? [...sbRows] : [];
+  } else if (["owner", "admin"].includes(dashboardState.currentProfile?.role || "")) {
+    // Quietly keep Supabase product_catalog synchronized with latest deployed releases
+    const nowIso = new Date().toISOString();
+    const toSync = catalogRows.filter((r) => {
+      const prev = sbByKey.get(`${r.product_id}::${r.model_id}`);
+      return !prev || prev.latest_version !== r.latest_version || prev.release_notes !== r.release_notes;
+    });
+    if (toSync.length > 0) {
+      supabase
+        .from("product_catalog")
+        .upsert(
+          toSync.map((r) => ({
+            product_id: r.product_id,
+            product_name: r.product_name,
+            model_id: r.model_id,
+            model_name: r.model_name,
+            chip: r.chip,
+            hw_rev: r.hw_rev,
+            latest_version: r.latest_version,
+            firmware_url: r.firmware_url,
+            bootloader_url: r.bootloader_url,
+            partitions_url: r.partitions_url,
+            boot_app0_url: r.boot_app0_url,
+            version_url: r.version_url,
+            capabilities: r.capabilities,
+            description: r.release_notes,
+            release_notes: r.release_notes,
+            is_public: true,
+            updated_at: nowIso
+          })),
+          { onConflict: "product_id,model_id" }
+        )
+        .then(() => {})
+        .catch(() => {});
+    }
   }
 
   const data = catalogRows;

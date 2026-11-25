@@ -267,7 +267,25 @@ export function populateModal(hwId) {
       d.cloud_online ? "Online" : "Disconnected"
     }</strong></div>
     <div class="kv-row"><span>MAC Address</span><strong class="mono">${d.mac || "--"}</strong></div>
+    ${
+      devProdSlug === "smarty"
+        ? `<div class="kv-row"><span>SinricPro Device ID</span><strong class="mono">${d.sinric_id || "--"}</strong></div>`
+        : ""
+    }
   `;
+
+  const sinricBox = document.getElementById("mSmartySinricBox");
+  const sinricInput = document.getElementById("mSinricDeviceIdInput");
+  const sinricFb = document.getElementById("mSinricFeedback");
+  if (sinricBox) {
+    const showSinric = devProdSlug === "smarty" && isEditorOrAdmin;
+    sinricBox.style.display = showSinric ? "" : "none";
+    if (sinricInput) sinricInput.value = d.sinric_id || "";
+    if (sinricFb) {
+      sinricFb.className = "fota-feedback";
+      sinricFb.textContent = "";
+    }
+  }
 
   updateFotaButtonsUi(d, targetVer, isUpToDate, false);
   if (isEditorOrAdmin) {
@@ -512,6 +530,74 @@ export async function renameCurrentDevice() {
     renderFleet();
     populateModal(hwId);
   }
+}
+
+export async function saveSmartySinricId() {
+  const hwId = dashboardState.selectedHwId;
+  const d = hwId ? dashboardState.fleetRegistry[hwId] : null;
+  if (!hwId || !d) return;
+
+  const role = dashboardState.currentProfile?.role || "viewer";
+  if (!["owner", "admin", "manager", "editor"].includes(role)) return;
+  if (inferProductId(d) !== "smarty") return;
+
+  const input = document.getElementById("mSinricDeviceIdInput");
+  const btn = document.getElementById("mSinricSaveBtn");
+  const fb = document.getElementById("mSinricFeedback");
+  const setFb = (msg, tone = "") => {
+    if (!fb) return;
+    fb.className = msg ? `fota-feedback show ${tone}`.trim() : "fota-feedback";
+    fb.textContent = msg || "";
+  };
+
+  const deviceId = (input?.value || "").trim();
+  if (deviceId.length < 12 || /\s/.test(deviceId)) {
+    setFb("Please enter a valid SinricPro Device ID (at least 12 characters, no spaces).", "err");
+    return;
+  }
+
+  const label = d.alias || hwId;
+  if (
+    !confirm(
+      `Assign SinricPro Device ID "${deviceId}" to "${label}"?\n\nSmarty will save this ID into persistent NVS (FOTA-safe) and reboot automatically on its next cloud heartbeat (~45–60s).`
+    )
+  ) {
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Queueing…";
+  }
+
+  const actor = dashboardState.currentProfile?.email || dashboardState.currentUser?.email || "dashboard";
+  const { error } = await supabase.from("device_commands").insert({
+    hw_id: hwId,
+    cmd: {
+      sinric_device_id: deviceId,
+      sinric_profile: d.alias || d.profile || "Smarty_Custom",
+      requested_at: new Date().toISOString()
+    },
+    created_by: actor
+  });
+
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = "Save & Push";
+  }
+
+  if (error) {
+    setFb(`Failed to queue SinricPro Device ID: ${error.message}`, "err");
+    return;
+  }
+
+  d.sinric_id = deviceId;
+  await upsertDeviceToSupabase(d);
+  setFb(
+    `SinricPro Device ID queued (${deviceId}). Smarty will store it in NVS and reboot on its next heartbeat (~45–60s).`,
+    "ok"
+  );
+  pushEventLog(hwId, "SINRIC_ID_QUEUED", `SinricPro Device ID set to ${deviceId} by ${actor}`);
 }
 
 export async function removeCurrentDevice(closeModalFn) {

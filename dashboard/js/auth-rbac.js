@@ -95,13 +95,12 @@ export function applyRolePermissionsUI() {
   document.getElementById("navUsersBtn").style.display = isAdmin ? "inline-flex" : "none";
 
   document.querySelectorAll(".role-editor").forEach((el) => {
-    el.disabled = !isEditorOrAdmin;
+    if ("disabled" in el) el.disabled = !isEditorOrAdmin;
+    el.style.display = isEditorOrAdmin ? "" : "none";
   });
   document.querySelectorAll(".role-admin").forEach((el) => {
-    el.disabled = !isAdmin;
-    if (el.tagName === "BUTTON") {
-      el.style.display = isAdmin ? "inline-flex" : "none";
-    }
+    if ("disabled" in el) el.disabled = !isAdmin;
+    el.style.display = isAdmin ? "" : "none";
   });
 }
 

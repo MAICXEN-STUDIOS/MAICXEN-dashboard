@@ -149,7 +149,9 @@ export async function loadProductCatalog(onAfterRender) {
 
     const tbody = document.getElementById("catalogTableBody");
     if (tbody) {
-      const isAdmin = ["owner", "admin"].includes(dashboardState.currentProfile?.role || "");
+      const role = dashboardState.currentProfile?.role || "viewer";
+      const isAdmin = ["owner", "admin"].includes(role);
+      const isEditorOrAdmin = isAdmin || ["manager", "editor"].includes(role);
       tbody.innerHTML = data
         .map((row) => {
           const capsList = Array.isArray(row.capabilities) ? row.capabilities : [];
@@ -198,9 +200,13 @@ export async function loadProductCatalog(onAfterRender) {
               </td>
               <td style="text-align:right;">
                 <div class="row-inline" style="justify-content:flex-end;">
-                  <a href="https://iot.maicxen.it/?product=${encodeURIComponent(row.product_id)}&model=${encodeURIComponent(
-            row.model_id
-          )}" class="pill-btn">Flash ↗</a>
+                  ${
+                    isEditorOrAdmin
+                      ? `<a href="https://iot.maicxen.it/?product=${encodeURIComponent(row.product_id)}&model=${encodeURIComponent(
+                          row.model_id
+                        )}" class="pill-btn">Flash ↗</a>`
+                      : `<span style="font-size:12px;color:var(--apple-text-tertiary);">Read-only</span>`
+                  }
                   ${
                     isAdmin
                       ? `<button type="button" class="pill-btn" onclick="editCatalogEntry('${row.product_id}','${row.model_id}')">Edit</button>`
@@ -223,7 +229,7 @@ export async function loadProductCatalog(onAfterRender) {
 }
 
 export async function saveCatalogEntry(onAfterRender) {
-  if (dashboardState.currentProfile?.role !== "admin") return;
+  if (!["owner", "admin"].includes(dashboardState.currentProfile?.role || "")) return;
   const product_id = document.getElementById("catProdId").value.trim().toLowerCase();
   const product_name = document.getElementById("catProdName").value.trim();
   const model_id = document.getElementById("catModelId").value.trim().toLowerCase();
@@ -280,7 +286,7 @@ export async function saveCatalogEntry(onAfterRender) {
 }
 
 export async function deleteCatalogEntry(id, onAfterRender) {
-  if (dashboardState.currentProfile?.role !== "admin") return;
+  if (!["owner", "admin"].includes(dashboardState.currentProfile?.role || "")) return;
   if (!confirm("Delete this product variant from the catalog?")) return;
   await supabase.from("product_catalog").delete().eq("id", id);
   await loadProductCatalog(onAfterRender);

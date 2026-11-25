@@ -62,6 +62,8 @@ export async function loadEventsFromSupabase() {
 }
 
 export async function pushEventLog(hwId, eventType, detail) {
+  const role = dashboardState.currentProfile?.role || "viewer";
+  if (!["owner", "admin", "manager", "editor"].includes(role)) return;
   const actor = dashboardState.currentProfile?.email || "";
   dashboardState.eventLogs.unshift({
     time: new Date().toLocaleString("en-GB"),
@@ -81,7 +83,7 @@ export async function pushEventLog(hwId, eventType, detail) {
 }
 
 export async function clearEventLog() {
-  if (dashboardState.currentProfile?.role !== "admin") return;
+  if (!["owner", "admin"].includes(dashboardState.currentProfile?.role || "")) return;
   await supabase.from("smarty_events").delete().gt("id", 0);
   dashboardState.eventLogs = [];
   renderEventLogs();

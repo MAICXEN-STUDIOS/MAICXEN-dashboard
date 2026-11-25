@@ -53,6 +53,11 @@ function closeDeviceModal() {
 }
 
 function switchSection(secId, btnEl) {
+  const role = dashboardState.currentProfile?.role || "viewer";
+  const isAdmin = ["owner", "admin"].includes(role);
+  const isEditorOrAdmin = isAdmin || ["manager", "editor"].includes(role);
+  if (secId === "users" && !isAdmin) return;
+  if (secId === "actions" && !isEditorOrAdmin) return;
   document.querySelectorAll(".section-view").forEach((s) => s.classList.remove("active"));
   document.querySelectorAll(".nav-tab").forEach((b) => b.classList.remove("active"));
   document.getElementById("sec-" + secId).classList.add("active");

@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" />
-  <link rel="stylesheet" href="./shared/css/tokens.css?v=2.5.1" />
-  <link rel="stylesheet" href="./css/dashboard.css?v=2.5.1" />
+  <link rel="stylesheet" href="./shared/css/tokens.css?v=2.5.2" />
+  <link rel="stylesheet" href="./css/dashboard.css?v=2.5.2" />
 </head>
 <body>
 
@@ -453,13 +453,17 @@
       <div class="modal-pane active" id="mpane-ctrl">
         <div class="list-group modal-kv-list" id="mOverviewGrid"></div>
         <div class="modal-actions">
-          <a id="mLocalUiBtn" href="#" target="_blank" rel="noopener" class="primary-btn modal-cta">
+          <button type="button" id="mForceFotaBtn" class="primary-btn modal-cta role-editor" onclick="triggerRemoteFota()">
+            Force FOTA Update
+          </button>
+          <a id="mLocalUiBtn" href="#" target="_blank" rel="noopener" class="pill-btn modal-sec-cta">
             Open Local Web UI ↗
           </a>
           <a id="mFlashUsbBtn" href="https://iot.maicxen.it/" class="pill-btn modal-sec-cta">
             Flash via USB ↗
           </a>
         </div>
+        <div id="mFotaFeedback" class="fota-feedback" role="status" aria-live="polite"></div>
       </div>
 
       <!-- MODAL TAB 2 -->
@@ -470,13 +474,16 @@
       <!-- MODAL TAB 3 -->
       <div class="modal-pane" id="mpane-sys">
         <div class="list-group modal-kv-list" id="mSysGrid"></div>
-        <div class="modal-danger-bar">
+        <div class="modal-danger-bar" style="justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <button type="button" id="mSysForceFotaBtn" class="pill-btn role-editor" onclick="triggerRemoteFota()">
+            Force Remote FOTA
+          </button>
           <button type="button" class="pill-btn danger role-admin" onclick="removeCurrentDevice()">Remove Device (Admin)</button>
         </div>
       </div>
     </div>
   </div>
 
-  <script type="module" src="./js/main.js?v=2.5.1"></script>
+  <script type="module" src="./js/main.js?v=2.5.2"></script>
 </body>
 </html>

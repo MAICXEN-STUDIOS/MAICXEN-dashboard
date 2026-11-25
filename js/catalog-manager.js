@@ -32,11 +32,49 @@ export function editCatalogEntry(prodId, modId) {
 }
 
 export async function loadProductCatalog(onAfterRender) {
-  const { data } = await supabase
+  const { data: sbRows } = await supabase
     .from("product_catalog")
     .select("*")
     .order("product_id", { ascending: true });
 
+  // Merge live catalog.json (always synced with compiled firmware releases & emblems) over Supabase rows
+  let catalogRows = Array.isArray(sbRows) ? [...sbRows] : [];
+  try {
+    const res = await fetch(`./catalog.json?cb=${Date.now()}`, { cache: "no-store" });
+    if (res.ok) {
+      const cat = await res.json();
+      if (Array.isArray(cat.products) && cat.products.length > 0) {
+        const byKey = new Map(catalogRows.map((r) => [`${r.product_id}::${r.model_id}`, r]));
+        cat.products.forEach((prod) => {
+          (prod.models || []).forEach((m) => {
+            const key = `${prod.product_id}::${m.model_id}`;
+            const prev = byKey.get(key) || {};
+            byKey.set(key, {
+              ...prev,
+              product_id: prod.product_id,
+              product_name: prod.product_name,
+              model_id: m.model_id,
+              model_name: m.model_name,
+              chip: m.chip || prev.chip || "ESP32-S3",
+              hw_rev: m.hw_rev || prev.hw_rev || "1.0",
+              emblem: m.emblem || prod.emblem || `./shared/assets/emblems/edge-${prod.product_id}-${m.model_id}-emblem.webp`,
+              latest_version: m.latest_version || prod.latest_version || prev.latest_version || "1.0.0",
+              capabilities: Array.isArray(m.capabilities) && m.capabilities.length ? m.capabilities : (prev.capabilities || []),
+              release_notes: m.notes || prev.release_notes || prev.description || "",
+              description: m.notes || prev.description || ""
+            });
+          });
+        });
+        catalogRows = Array.from(byKey.values()).sort((a, b) =>
+          String(a.product_id).localeCompare(String(b.product_id))
+        );
+      }
+    }
+  } catch {
+    // Keep Supabase rows if catalog.json fetch fails
+  }
+
+  const data = catalogRows;
   if (data) {
     dashboardState.productCatalog = data;
 
@@ -63,11 +101,14 @@ export async function loadProductCatalog(onAfterRender) {
 
     const tbody = document.getElementById("catalogTableBody");
     if (tbody) {
-      const isAdmin = dashboardState.currentProfile?.role === "admin";
+      const isAdmin = ["owner", "admin"].includes(dashboardState.currentProfile?.role || "");
       tbody.innerHTML = data
         .map((row) => {
           const capsList = Array.isArray(row.capabilities) ? row.capabilities : [];
           const capsTitle = capsList.join(", ");
+          const emblemSrc =
+            row.emblem ||
+            `./shared/assets/emblems/edge-${String(row.product_id).toLowerCase()}-${String(row.model_id).toLowerCase()}-emblem.webp`;
           const notesSafe = String(row.release_notes || row.description || "No release notes provided.")
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
@@ -75,8 +116,20 @@ export async function loadProductCatalog(onAfterRender) {
           return `
             <tr>
               <td>
-                <strong>${row.product_name}</strong><br>
-                <code>${row.product_id}</code>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <img
+                    src="${emblemSrc}"
+                    alt="${row.product_name} emblem"
+                    width="34"
+                    height="34"
+                    style="width:34px;height:34px;border-radius:9px;object-fit:contain;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.14);padding:2px;flex-shrink:0;"
+                    onerror="this.style.display='none'"
+                  />
+                  <div>
+                    <strong>${row.product_name}</strong><br>
+                    <code>${row.product_id}</code>
+                  </div>
+                </div>
               </td>
               <td>
                 <strong>${row.model_name}</strong><br>

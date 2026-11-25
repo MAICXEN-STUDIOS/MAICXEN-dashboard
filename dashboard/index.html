@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" />
-  <link rel="stylesheet" href="./shared/css/tokens.css?v=3.3.0" />
-  <link rel="stylesheet" href="./css/dashboard.css?v=3.3.0" />
+  <link rel="stylesheet" href="./shared/css/tokens.css?v=3.3.1" />
+  <link rel="stylesheet" href="./css/dashboard.css?v=3.3.1" />
 </head>
 <body>
 
@@ -70,7 +70,7 @@
           />
           <div class="brand-meta">
             <span class="brand-product">Fleet Console</span>
-            <span class="brand-ver">v3.3.0</span>
+            <span class="brand-ver">v3.3.1</span>
             <span class="live-pill" id="streamStatusPill">LIVE</span>
           </div>
         </div>
@@ -420,7 +420,7 @@
           <span class="sep">·</span>
           <span>iot.maicxen.it</span>
           <span class="sep">·</span>
-          <span>Fleet Console v3.3.0</span>
+          <span>Fleet Console v3.3.1</span>
         </div>
       </div>
     </footer>
@@ -476,6 +476,29 @@
       <!-- MODAL TAB 3 -->
       <div class="modal-pane" id="mpane-sys">
         <div class="list-group modal-kv-list" id="mSysGrid"></div>
+        <div id="mSmartySinricBox" class="list-group modal-kv-list" style="display:none;margin-top:12px;">
+          <div class="list-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+            <div class="list-row-label">
+              <span class="row-title">SinricPro Device ID (Smarty NVS)</span>
+              <span class="row-sub">FOTA-safe per-device Alexa identity stored in ESP32 NVS. Pushed on next heartbeat (~45–60s).</span>
+            </div>
+            <div class="row-inline" style="width:100%;">
+              <input
+                type="text"
+                id="mSinricDeviceIdInput"
+                class="apple-input mono"
+                style="flex:1;min-width:210px;"
+                placeholder="e.g. 653f8aad63039b95af237931"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button type="button" id="mSinricSaveBtn" class="pill-btn primary role-editor" onclick="saveSmartySinricId()">
+                Save &amp; Push
+              </button>
+            </div>
+            <div id="mSinricFeedback" class="fota-feedback" style="margin-top:0;" role="status" aria-live="polite"></div>
+          </div>
+        </div>
         <div class="modal-danger-bar role-editor" style="justify-content:space-between;gap:10px;flex-wrap:wrap;">
           <button type="button" id="mSysForceFotaBtn" class="pill-btn role-editor" onclick="triggerRemoteFota()">
             Force Remote FOTA
@@ -486,6 +509,6 @@
     </div>
   </div>
 
-  <script type="module" src="./js/main.js?v=3.3.0"></script>
+  <script type="module" src="./js/main.js?v=3.3.1"></script>
 </body>
 </html>

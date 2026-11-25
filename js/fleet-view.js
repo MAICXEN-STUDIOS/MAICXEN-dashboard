@@ -96,6 +96,10 @@ export function renderFleet() {
     return;
   }
 
+  const isEditorOrAdmin = ["owner", "admin", "manager", "editor"].includes(
+    dashboardState.currentProfile?.role || "viewer"
+  );
+
   list.innerHTML = filtered
     .map((d) => {
       const isOnline = nowMs - (d.last_seen_ms || 0) < 180000;
@@ -115,9 +119,9 @@ export function renderFleet() {
             <img
               src="${emblemUrl}"
               alt="${devProd} ${devModel}"
-              width="52"
-              height="52"
-              style="width:52px;height:52px;border-radius:12px;object-fit:contain;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.14);padding:3px;${d.power ? "" : "opacity:0.55;filter:grayscale(0.45);"}"
+              width="48"
+              height="48"
+              style="width:100%;height:100%;border-radius:12px;object-fit:contain;${d.power ? "" : "opacity:0.55;filter:grayscale(0.45);"}"
               onerror="this.style.visibility='hidden'"
             />
           </div>
@@ -142,7 +146,7 @@ export function renderFleet() {
           <div class="device-actions">
             <span class="pill ${isUpToDate ? "green" : "amber"}" title="${verTitle}">v${d.fw || "--"}</span>
             ${
-              hasValidIp
+              isEditorOrAdmin && hasValidIp
                 ? `<a href="http://${d.wifi_ip}" target="_blank" rel="noopener" class="pill-btn" onclick="event.stopPropagation()">Local UI ↗</a>`
                 : ""
             }
@@ -176,18 +180,14 @@ export function populateModal(hwId) {
     d.hw_rev || "1.0"
   }) · ${d.hw_id}`;
   document.getElementById("mPcbPreview").innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:center;padding:12px 0;">
-      <div style="width:128px;height:128px;border-radius:26px;padding:12px;background:rgba(12,14,20,0.92);border:1px solid rgba(255,255,255,0.14);box-shadow:0 16px 40px rgba(0,0,0,0.65),0 0 36px ${d.power ? "rgba(0,255,195,0.22)" : "rgba(255,255,255,0.06)"};display:flex;align-items:center;justify-content:center;">
-        <img
-          src="${modalEmblemUrl}"
-          alt="${devProd} emblem"
-          width="104"
-          height="104"
-          style="width:100%;height:100%;object-fit:contain;border-radius:16px;${d.power ? "" : "opacity:0.55;filter:grayscale(0.4);"}"
-          onerror="this.style.visibility='hidden'"
-        />
-      </div>
-    </div>
+    <img
+      src="${modalEmblemUrl}"
+      alt="${devProd} emblem"
+      width="116"
+      height="116"
+      style="width:116px;height:116px;object-fit:contain;border-radius:22px;filter:drop-shadow(0 12px 28px ${d.power ? "rgba(0,255,195,0.22)" : "rgba(0,0,0,0.65)"});${d.power ? "" : "opacity:0.55;filter:grayscale(0.45);"}"
+      onerror="this.style.visibility='hidden'"
+    />
   `;
 
   const pill = document.getElementById("mOnlinePill");

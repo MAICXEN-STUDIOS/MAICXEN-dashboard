@@ -107,13 +107,21 @@ export function renderFleet() {
         ? `Up to date (v${d.fw || "--"})`
         : `Update available: v${targetVer}`;
 
+      const emblemUrl = `./shared/assets/emblems/edge-${devProd.toLowerCase()}-${devModel.toLowerCase()}-emblem.webp`;
       return `
         <div class="device-row ${isOnline ? "online" : "offline"}" onclick="openDeviceModal('${d.hw_id}')">
           <div class="device-thumb">
-            ${buildStylizedPcbSvg(devProd.toLowerCase(), {
-              isPoweredOn: Boolean(d.power),
-              maxWidth: "74px"
-            })}
+            <img
+              src="${emblemUrl}"
+              alt="${devProd} ${devModel}"
+              width="52"
+              height="52"
+              style="width:52px;height:52px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,0.12);${d.power ? "" : "opacity:0.55;filter:grayscale(0.5);"}"
+              onerror="this.replaceWith(document.createRange().createContextualFragment(\`${buildStylizedPcbSvg(devProd.toLowerCase(), {
+                isPoweredOn: Boolean(d.power),
+                maxWidth: "74px"
+              }).replace(/`/g, "\\`")}\`))"
+            />
           </div>
 
           <div class="device-identity">
@@ -159,7 +167,13 @@ export function populateModal(hwId) {
   const devProd = devProdSlug.toUpperCase();
   const devModel = d.model_id || "esp32s3-std";
 
-  document.getElementById("mTitle").textContent = d.alias || d.hw_id;
+  const modalEmblemUrl = `./shared/assets/emblems/edge-${devProdSlug}-${devModel.toLowerCase()}-emblem.webp`;
+  document.getElementById("mTitle").innerHTML = `
+    <span style="display:inline-flex;align-items:center;gap:10px;">
+      <img src="${modalEmblemUrl}" alt="${devProd} emblem" width="32" height="32" style="width:32px;height:32px;border-radius:8px;object-fit:contain;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.14);padding:2px;" onerror="this.style.display='none'" />
+      <span>${d.alias || d.hw_id}</span>
+    </span>
+  `;
   document.getElementById("mSubtitle").textContent = `${devProd} · ${devModel} (Rev ${
     d.hw_rev || "1.0"
   }) · ${d.hw_id}`;

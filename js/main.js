@@ -20,7 +20,8 @@ import {
   probeLocalDevice,
   connectRealtimeStream,
   renameCurrentDevice,
-  removeCurrentDevice
+  removeCurrentDevice,
+  triggerRemoteFota
 } from "./fleet-view.js";
 import {
   loadUsersList,
@@ -146,6 +147,7 @@ Object.assign(window, {
   closeDeviceModal,
   renameCurrentDevice,
   removeCurrentDevice: () => removeCurrentDevice(closeDeviceModal),
+  triggerRemoteFota,
   probeLocalDevice: () => probeLocalDevice(openDeviceModal),
   loadProductCatalog: () => loadProductCatalog(renderFleet),
   saveCatalogEntry: () => saveCatalogEntry(renderFleet),

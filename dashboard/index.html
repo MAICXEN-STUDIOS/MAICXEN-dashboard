@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" />
-  <link rel="stylesheet" href="./shared/css/tokens.css?v=2.5.2" />
-  <link rel="stylesheet" href="./css/dashboard.css?v=2.5.2" />
+  <link rel="stylesheet" href="./shared/css/tokens.css?v=2.5.3" />
+  <link rel="stylesheet" href="./css/dashboard.css?v=2.5.3" />
 </head>
 <body>
 
@@ -78,13 +78,13 @@
         <nav class="view-segmented" role="tablist" aria-label="Console sections">
           <button type="button" class="nav-tab active" onclick="switchSection('devices', this)">Devices</button>
           <button type="button" class="nav-tab" onclick="switchSection('catalog', this)">Catalog</button>
-          <button type="button" class="nav-tab" onclick="switchSection('actions', this)">Discovery</button>
+          <button type="button" class="nav-tab role-editor" id="navDiscoveryBtn" onclick="switchSection('actions', this)">Discovery</button>
           <button type="button" class="nav-tab" onclick="switchSection('logs', this)">Activity</button>
           <button type="button" class="nav-tab" id="navUsersBtn" style="display:none;" onclick="switchSection('users', this)">Users</button>
         </nav>
 
         <div class="topbar-actions">
-          <a href="https://iot.maicxen.it/" class="nav-link" title="Open Public Web Flasher">
+          <a href="https://iot.maicxen.it/" class="nav-link role-editor" title="Open Public Web Flasher">
             <span>Flasher</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M7 17L17 7"/><path d="M7 7h10v10"/>
@@ -251,7 +251,7 @@
           </div>
           <div class="row-inline log-actions-row">
             <input type="text" id="logSearchFilter" class="apple-input input-md" placeholder="Filter by ID or event…" oninput="renderEventLogs()" />
-            <button type="button" class="pill-btn" onclick="exportEventLog()">Export .txt</button>
+            <button type="button" class="pill-btn role-editor" onclick="exportEventLog()">Export .txt</button>
             <button type="button" class="pill-btn danger role-admin" onclick="clearEventLog()">Clear Log</button>
           </div>
         </div>
@@ -388,17 +388,19 @@
           </div>
         </div>
 
-        <div class="group-caption">Fleet Snapshot Backup</div>
-        <div class="list-group">
-          <div class="list-row compact">
-            <div class="list-row-label">
-              <span class="row-title">Registry JSON Export / Import</span>
-              <span class="row-sub">Download or restore fleet device snapshots</span>
-            </div>
-            <div class="list-row-control row-inline">
-              <button type="button" class="pill-btn" onclick="exportRegistry()">Export JSON</button>
-              <button type="button" class="pill-btn role-admin" onclick="document.getElementById('importFile').click()">Import JSON</button>
-              <input type="file" id="importFile" accept=".json" style="display:none" onchange="importRegistry(event)" />
+        <div class="role-editor">
+          <div class="group-caption">Fleet Snapshot Backup</div>
+          <div class="list-group">
+            <div class="list-row compact">
+              <div class="list-row-label">
+                <span class="row-title">Registry JSON Export / Import</span>
+                <span class="row-sub">Download or restore fleet device snapshots</span>
+              </div>
+              <div class="list-row-control row-inline">
+                <button type="button" class="pill-btn" onclick="exportRegistry()">Export JSON</button>
+                <button type="button" class="pill-btn role-admin" onclick="document.getElementById('importFile').click()">Import JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importRegistry(event)" />
+              </div>
             </div>
           </div>
         </div>
@@ -452,18 +454,18 @@
       <!-- MODAL TAB 1 -->
       <div class="modal-pane active" id="mpane-ctrl">
         <div class="list-group modal-kv-list" id="mOverviewGrid"></div>
-        <div class="modal-actions">
+        <div class="modal-actions role-editor">
           <button type="button" id="mForceFotaBtn" class="primary-btn modal-cta role-editor" onclick="triggerRemoteFota()">
             Force FOTA Update
           </button>
-          <a id="mLocalUiBtn" href="#" target="_blank" rel="noopener" class="pill-btn modal-sec-cta">
+          <a id="mLocalUiBtn" href="#" target="_blank" rel="noopener" class="pill-btn modal-sec-cta role-editor">
             Open Local Web UI ↗
           </a>
-          <a id="mFlashUsbBtn" href="https://iot.maicxen.it/" class="pill-btn modal-sec-cta">
+          <a id="mFlashUsbBtn" href="https://iot.maicxen.it/" class="pill-btn modal-sec-cta role-editor">
             Flash via USB ↗
           </a>
         </div>
-        <div id="mFotaFeedback" class="fota-feedback" role="status" aria-live="polite"></div>
+        <div id="mFotaFeedback" class="fota-feedback role-editor" role="status" aria-live="polite"></div>
       </div>
 
       <!-- MODAL TAB 2 -->
@@ -474,7 +476,7 @@
       <!-- MODAL TAB 3 -->
       <div class="modal-pane" id="mpane-sys">
         <div class="list-group modal-kv-list" id="mSysGrid"></div>
-        <div class="modal-danger-bar" style="justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div class="modal-danger-bar role-editor" style="justify-content:space-between;gap:10px;flex-wrap:wrap;">
           <button type="button" id="mSysForceFotaBtn" class="pill-btn role-editor" onclick="triggerRemoteFota()">
             Force Remote FOTA
           </button>
@@ -484,6 +486,6 @@
     </div>
   </div>
 
-  <script type="module" src="./js/main.js?v=2.5.2"></script>
+  <script type="module" src="./js/main.js?v=2.5.3"></script>
 </body>
 </html>

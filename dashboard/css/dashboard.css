@@ -1191,6 +1191,40 @@ body {
   padding-top: 8px;
 }
 
+.fota-feedback {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  border: 1px solid var(--apple-hairline-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--apple-text-secondary);
+}
+
+.fota-feedback.show {
+  display: block;
+}
+
+.fota-feedback.queued {
+  border-color: rgba(245, 158, 11, 0.38);
+  background: rgba(245, 158, 11, 0.09);
+  color: #fbbf24;
+}
+
+.fota-feedback.ok {
+  border-color: rgba(16, 185, 129, 0.38);
+  background: rgba(16, 185, 129, 0.09);
+  color: #34d399;
+}
+
+.fota-feedback.err {
+  border-color: rgba(239, 68, 68, 0.38);
+  background: rgba(239, 68, 68, 0.09);
+  color: #f87171;
+}
+
 /* --- Minimal Footer with B&W Logo --- */
 .footer {
   border-top: 1px solid var(--apple-hairline);

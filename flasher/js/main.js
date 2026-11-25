@@ -28,6 +28,8 @@ let localFirmwareFile = null; // { name, bytes: Uint8Array, sha256 }
 // Core DOM References
 const pcbVisEl = document.getElementById("pcbVisualizer");
 const productTabsEl = document.getElementById("productTabs");
+const heroProductEmblemWrapEl = document.getElementById("heroProductEmblemWrap");
+const heroProductEmblemEl = document.getElementById("heroProductEmblem");
 const heroProductTitleEl = document.getElementById("heroProductTitle");
 const heroProductTaglineEl = document.getElementById("heroProductTagline");
 const modelSelectEl = document.getElementById("modelSelect");
@@ -153,7 +155,10 @@ function updateProgress(stepText, pct) {
 // --- Product & Model Selection ---
 function renderProductTabs() {
   productTabsEl.innerHTML = "";
-  catalogProducts.forEach((prod) => {
+  const flashableProducts = catalogProducts.filter(
+    (p) => Array.isArray(p.models) && p.models.some((m) => Boolean(m.firmware_url))
+  );
+  flashableProducts.forEach((prod) => {
     const btn = document.createElement("button");
     btn.type = "button";
     const isActive = selectedProduct && selectedProduct.product_id === prod.product_id;
@@ -161,8 +166,18 @@ function renderProductTabs() {
     btn.setAttribute("role", "tab");
     btn.setAttribute("aria-selected", isActive ? "true" : "false");
     const prodVer = prod.latest_version || prod.models?.[0]?.latest_version || "1.0.0";
+    const defaultModelId = prod.models?.[0]?.model_id || "";
+    const emblemSrc =
+      prod.emblem ||
+      (defaultModelId
+        ? `./shared/assets/emblems/edge-${prod.product_id}-${defaultModelId}-emblem.webp`
+        : "");
     btn.innerHTML = `
-      <span class="product-dot" style="background:${prod.accent || "#0a84ff"};"></span>
+      ${
+        emblemSrc
+          ? `<img src="${emblemSrc}" alt="${prod.product_name} emblem" width="24" height="24" style="width:24px;height:24px;border-radius:6px;object-fit:contain;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.12);padding:1px;flex-shrink:0;" onerror="this.style.display='none'" />`
+          : `<span class="product-dot" style="background:${prod.accent || "#0a84ff"};"></span>`
+      }
       <span>${prod.product_name}</span>
       <span class="product-seg-ver">v${prodVer}</span>
     `;
@@ -183,6 +198,20 @@ function selectModel(modelId) {
 
   heroProductTitleEl.textContent = selectedProduct.product_name;
   heroProductTaglineEl.textContent = selectedProduct.tagline || "MAICXEN EDGE Hardware Platform";
+  const activeEmblem =
+    selectedModel.emblem ||
+    selectedProduct.emblem ||
+    `./shared/assets/emblems/edge-${selectedProduct.product_id}-${selectedModel.model_id}-emblem.webp`;
+  if (heroProductEmblemWrapEl && heroProductEmblemEl && activeEmblem) {
+    heroProductEmblemEl.src = activeEmblem;
+    heroProductEmblemEl.alt = `${selectedProduct.product_name} Emblem`;
+    heroProductEmblemWrapEl.style.setProperty("--emblem-glow", `${selectedProduct.accent || "#00ffc3"}38`);
+    heroProductEmblemWrapEl.style.borderColor = `${selectedProduct.accent || "#00ffc3"}48`;
+    heroProductEmblemWrapEl.style.display = "inline-flex";
+    heroProductEmblemEl.onerror = () => {
+      heroProductEmblemWrapEl.style.display = "none";
+    };
+  }
   selectedModelTitleEl.textContent = `${selectedModel.model_name} · ${selectedModel.chip}`;
   fwVersionEl.textContent = `v${unifiedVer}`;
   popoverModelNameEl.textContent = `${selectedProduct.product_name} v${unifiedVer}`;

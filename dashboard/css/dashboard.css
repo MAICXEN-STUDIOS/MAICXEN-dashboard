@@ -710,15 +710,14 @@ body {
 }
 
 .device-thumb {
-  width: 82px;
-  height: 44px;
-  border-radius: 10px;
-  background: #090a0d;
-  border: 1px solid var(--apple-hairline);
+  width: 52px;
+  height: 52px;
+  background: transparent;
+  border: none;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px;
   flex-shrink: 0;
 }
 
@@ -1086,11 +1085,11 @@ body {
 }
 
 .modal-stage {
-  background: #090a0d;
-  border: 1px solid var(--apple-hairline);
-  border-radius: 18px;
-  padding: 22px 20px;
-  margin-bottom: 22px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 4px 0 12px;
+  margin-bottom: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1364,16 +1363,16 @@ body {
 
   /* Spacious 2-row Device List Item on Mobile (Zero Squishing or Overlap) */
   .device-row {
-    grid-template-columns: 58px minmax(0, 1fr) auto;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
     gap: 12px 12px;
     padding: 16px 16px;
   }
 
   .device-thumb {
-    width: 58px;
-    height: 36px;
-    padding: 4px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
     grid-row: 1;
     grid-column: 1;
   }

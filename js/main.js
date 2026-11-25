@@ -21,7 +21,8 @@ import {
   connectRealtimeStream,
   renameCurrentDevice,
   removeCurrentDevice,
-  triggerRemoteFota
+  triggerRemoteFota,
+  saveSmartySinricId
 } from "./fleet-view.js";
 import {
   loadUsersList,
@@ -153,6 +154,7 @@ Object.assign(window, {
   renameCurrentDevice,
   removeCurrentDevice: () => removeCurrentDevice(closeDeviceModal),
   triggerRemoteFota,
+  saveSmartySinricId,
   probeLocalDevice: () => probeLocalDevice(openDeviceModal),
   loadProductCatalog: () => loadProductCatalog(renderFleet),
   saveCatalogEntry: () => saveCatalogEntry(renderFleet),
